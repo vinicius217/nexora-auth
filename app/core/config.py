@@ -7,7 +7,11 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DATABASE_URL: str = Field(
         default="sqlite:///./login.db",
-        validation_alias=AliasChoices("NEON_URL", "DATABASE_URL"),
+        validation_alias=AliasChoices(
+            "NEON_DATABASE_URL",
+            "NEON_URL",
+            "DATABASE_URL",
+        ),
     )
     SECRET_KEY: str = "troque-essa-chave-no-.env-antes-de-ir-pra-producao"
     ALGORITHM: str = "HS256"

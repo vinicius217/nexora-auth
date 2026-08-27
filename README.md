@@ -155,7 +155,8 @@ DEMO_USER_NAME=Nexora Demo
 | `APP_NAME` | Nome da aplicação |
 | `ENVIRONMENT` | Ambiente atual (`development` ou `production`) |
 | `DATABASE_URL` | Endereço do banco usado localmente ou em outros provedores |
-| `NEON_URL` | Endereço do Neon; quando presente, tem prioridade sobre `DATABASE_URL` |
+| `NEON_DATABASE_URL` | Endereço com pooler criado pela integração Neon e usado com prioridade |
+| `NEON_URL` | Nome alternativo aceito para uma conexão Neon |
 | `SECRET_KEY` | Assinatura dos tokens |
 | `ALGORITHM` | Algoritmo JWT |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | Duração do acesso |
@@ -198,7 +199,7 @@ O projeto usa um ponto de entrada FastAPI reconhecido pela Vercel, inclui os arq
 1. Dentro do projeto na Vercel, abra **Storage** e clique em **Create Database**.
 2. Selecione **Neon Postgres** e o plano gratuito.
 3. Conecte o banco ao projeto. A integração adicionará as credenciais ao ambiente.
-4. Use `NEON` como **Custom Prefix** para a integração criar `NEON_URL`. Essa variável tem prioridade sobre uma `DATABASE_URL` já existente. Prefira a URL com pooler para execução serverless.
+4. Use `NEON` como **Custom Prefix**. A integração criará `NEON_DATABASE_URL`, que tem prioridade sobre uma `DATABASE_URL` já existente e utiliza pooler para execução serverless.
 
 ### 3. Configurar o ambiente
 
@@ -207,7 +208,7 @@ Em **Settings → Environment Variables**, adicione as variáveis abaixo para Pr
 ```env
 APP_NAME=Nexora
 ENVIRONMENT=production
-NEON_URL=<connection-string-do-neon-criada-pela-integracao>
+NEON_DATABASE_URL=<connection-string-criada-pela-integracao>
 SECRET_KEY=<chave-aleatoria-longa>
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
