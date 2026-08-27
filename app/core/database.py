@@ -16,10 +16,16 @@ def normalize_database_url(url: str) -> str:
 database_url = normalize_database_url(settings.DATABASE_URL)
 is_sqlite = database_url.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
+pool_options = {} if is_sqlite else {
+    "pool_size": 1,
+    "max_overflow": 2,
+    "pool_recycle": 300,
+}
 engine = create_engine(
     database_url,
     connect_args=connect_args,
     pool_pre_ping=not is_sqlite,
+    **pool_options,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

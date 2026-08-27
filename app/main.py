@@ -30,5 +30,5 @@ def health_check():
     return {"status": "ok"}
 
 
-# Serve os arquivos de static/ (html, css, js). html=True faz o "/" abrir o index.html.
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+# Serve public/ localmente; na Vercel, os mesmos arquivos também podem usar a CDN.
+app.mount("/", StaticFiles(directory="public", html=True), name="public")

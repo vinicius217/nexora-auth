@@ -1,5 +1,6 @@
 import secrets
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -22,6 +23,14 @@ def ensure_demo_user(db: Session) -> Usuario | None:
             senha_hash=hash_senha(secrets.token_urlsafe(32)),
         )
         db.add(usuario)
+        try:
+            db.flush()
+        except IntegrityError:
+            # Duas funções serverless podem iniciar ao mesmo tempo.
+            db.rollback()
+            usuario = db.query(Usuario).filter(Usuario.email == email).first()
+            if usuario is None:
+                raise
 
     usuario.nome = settings.DEMO_USER_NAME
     usuario.ativo = True

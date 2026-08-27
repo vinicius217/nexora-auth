@@ -42,7 +42,7 @@ nexora-auth/
 │   ├── schemas/usuario.py     # Entradas e respostas
 │   ├── services/              # Regras de negócio
 │   └── main.py                # Inicialização do FastAPI
-├── static/
+├── public/
 │   ├── css/style.css          # Design e responsividade
 │   ├── js/api.js              # Cliente HTTP da interface
 │   ├── index.html             # Login
@@ -50,8 +50,10 @@ nexora-auth/
 │   ├── recuperar.html         # Recuperação de senha
 │   └── dashboard.html         # Área autenticada
 ├── .env.example
+├── .python-version
 ├── Dockerfile
 ├── requirements.txt
+├── vercel.json
 └── README.md
 ```
 
@@ -59,11 +61,11 @@ nexora-auth/
 
 ### Inicialização
 
-`app/main.py` cria as tabelas, registra as rotas e monta a pasta `static`. Assim, o mesmo servidor entrega a API e o frontend.
+`app/main.py` cria as tabelas, registra as rotas e monta a pasta `public`. Assim, o mesmo servidor entrega a API e o frontend localmente. Na Vercel, os arquivos públicos também podem ser distribuídos pela CDN.
 
 ```python
 app.include_router(auth.router)
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/", StaticFiles(directory="public", html=True), name="public")
 ```
 
 ### Configuração e banco
@@ -83,9 +85,9 @@ Os tokens são enviados em cookies `HttpOnly`, reduzindo a exposição ao JavaSc
 
 ### Frontend
 
-`static/js/api.js` centraliza as chamadas `fetch`, envia os cookies com `credentials: "include"` e padroniza mensagens, carregamento e logout. Cada HTML mantém apenas a lógica específica da tela.
+`public/js/api.js` centraliza as chamadas `fetch`, envia os cookies com `credentials: "include"` e padroniza mensagens, carregamento e logout. Cada HTML mantém apenas a lógica específica da tela.
 
-`static/css/style.css` contém o design system, os componentes, o dashboard, os breakpoints responsivos e o suporte a movimento reduzido.
+`public/css/style.css` contém o design system, os componentes, o dashboard, os breakpoints responsivos e o suporte a movimento reduzido.
 
 ## Como executar
 
@@ -180,26 +182,31 @@ DEMO_USER_NAME=Nexora Demo
 | `POST` | `/auth/verificar-email` | Confirma o e-mail pelo token |
 | `GET` | `/health` | Verifica a disponibilidade do serviço |
 
-## Publicar no Koyeb
+## Publicar na Vercel
 
-O projeto inclui um `Dockerfile`, aceita PostgreSQL por `DATABASE_URL` e respeita a porta fornecida pela hospedagem.
+O projeto usa um ponto de entrada FastAPI reconhecido pela Vercel, inclui os arquivos públicos no bundle da função e está preparado para PostgreSQL serverless.
 
-### 1. Criar o banco
+### 1. Importar o projeto
 
-1. No painel do Koyeb, crie um **Database Service** PostgreSQL.
-2. Copie a connection string fornecida pelo serviço.
+1. Acesse `https://vercel.com/new` e conecte sua conta do GitHub.
+2. Importe o repositório `vinicius217/nexora-auth`.
+3. Mantenha o diretório raiz e as configurações de build detectadas automaticamente.
 
-### 2. Criar o serviço web
+### 2. Criar o banco Neon
 
-1. Clique em **Create Web Service** e escolha o repositório `vinicius217/nexora-auth`.
-2. Selecione a branch `main` e o método de build por `Dockerfile`.
-3. Escolha a instância gratuita e configure `/health` como health check.
-4. Adicione as variáveis abaixo:
+1. Dentro do projeto na Vercel, abra **Storage** e clique em **Create Database**.
+2. Selecione **Neon Postgres** e o plano gratuito.
+3. Conecte o banco ao projeto. A integração adicionará as credenciais ao ambiente.
+4. Confirme que existe uma variável `DATABASE_URL` com a connection string PostgreSQL. Prefira a URL com pooler para execução serverless.
+
+### 3. Configurar o ambiente
+
+Em **Settings → Environment Variables**, adicione as variáveis abaixo para Production, Preview e Development:
 
 ```env
 APP_NAME=Nexora
 ENVIRONMENT=production
-DATABASE_URL=<connection-string-do-postgresql>
+DATABASE_URL=<connection-string-do-neon>
 SECRET_KEY=<chave-aleatoria-longa>
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
@@ -216,17 +223,21 @@ Gere uma `SECRET_KEY` localmente com:
 python -c "import secrets; print(secrets.token_urlsafe(64))"
 ```
 
-Após o deploy, abra a URL terminada em `.koyeb.app`. O botão **Acessar demonstração** será exibido automaticamente na tela de login.
+Depois de salvar as variáveis, faça um novo deploy. A URL terminará em `.vercel.app` e o botão **Acessar demonstração** será exibido automaticamente.
 
-### 3. Atualizar o portfólio
+### 4. Atualizar o portfólio
 
 Use a URL pública no botão principal do projeto e mantenha o GitHub como ação secundária:
 
 ```html
-<a href="https://SEU-SERVICO.koyeb.app" target="_blank" rel="noopener noreferrer">
+<a href="https://SEU-PROJETO.vercel.app" target="_blank" rel="noopener noreferrer">
   Abrir demonstração →
 </a>
 ```
+
+## Hospedagem alternativa com Docker
+
+O `Dockerfile` continua disponível para serviços compatíveis com contêineres, como Koyeb, Render ou uma infraestrutura própria.
 
 ## Segurança em produção
 
