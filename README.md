@@ -12,6 +12,8 @@ Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e JavaS
 - Recuperação e redefinição de senha por token.
 - Edição de nome, avatar e senha.
 - Dashboard responsivo com navegação mobile.
+- Modo de demonstração somente leitura para recrutadores.
+- Health check para monitoramento da aplicação.
 - Documentação interativa da API com Swagger.
 
 ## Tecnologias
@@ -19,7 +21,7 @@ Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e JavaS
 | Camada | Tecnologias |
 | --- | --- |
 | Backend | Python, FastAPI e Uvicorn |
-| Banco de dados | SQLite e SQLAlchemy |
+| Banco de dados | SQLite, PostgreSQL e SQLAlchemy |
 | Validação | Pydantic |
 | Segurança | JWT, bcrypt e cookies HttpOnly |
 | Frontend | HTML5, CSS3 e JavaScript puro |
@@ -48,6 +50,7 @@ nexora-auth/
 │   ├── recuperar.html         # Recuperação de senha
 │   └── dashboard.html         # Área autenticada
 ├── .env.example
+├── Dockerfile
 ├── requirements.txt
 └── README.md
 ```
@@ -133,23 +136,31 @@ Copie `.env.example` para `.env`:
 
 ```env
 APP_NAME=Nexora
+ENVIRONMENT=development
 DATABASE_URL=sqlite:///./login.db
 SECRET_KEY=gere-uma-chave-longa-e-aleatoria
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
 SECURE_COOKIES=false
+DEMO_MODE=false
+DEMO_USER_EMAIL=demo@nexora.dev
+DEMO_USER_NAME=Nexora Demo
 ```
 
 | Variável | Finalidade |
 | --- | --- |
 | `APP_NAME` | Nome da aplicação |
+| `ENVIRONMENT` | Ambiente atual (`development` ou `production`) |
 | `DATABASE_URL` | Endereço do banco |
 | `SECRET_KEY` | Assinatura dos tokens |
 | `ALGORITHM` | Algoritmo JWT |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | Duração do acesso |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | Duração da renovação |
 | `SECURE_COOKIES` | Restringe cookies a HTTPS |
+| `DEMO_MODE` | Ativa o acesso de demonstração sem cadastro |
+| `DEMO_USER_EMAIL` | E-mail interno da conta demonstrativa |
+| `DEMO_USER_NAME` | Nome exibido na conta demonstrativa |
 
 ## Endpoints principais
 
@@ -157,6 +168,8 @@ SECURE_COOKIES=false
 | --- | --- | --- |
 | `POST` | `/auth/registrar` | Cria uma conta |
 | `POST` | `/auth/login` | Autentica e cria a sessão |
+| `GET` | `/auth/demo` | Informa se o modo demonstrativo está ativo |
+| `POST` | `/auth/demo` | Inicia uma sessão demonstrativa |
 | `POST` | `/auth/refresh` | Renova o access token |
 | `POST` | `/auth/logout` | Encerra a sessão |
 | `GET` | `/auth/me` | Retorna o usuário atual |
@@ -165,6 +178,55 @@ SECURE_COOKIES=false
 | `POST` | `/auth/esqueci-senha` | Cria um token de recuperação |
 | `POST` | `/auth/resetar-senha` | Redefine a senha pelo token |
 | `POST` | `/auth/verificar-email` | Confirma o e-mail pelo token |
+| `GET` | `/health` | Verifica a disponibilidade do serviço |
+
+## Publicar no Koyeb
+
+O projeto inclui um `Dockerfile`, aceita PostgreSQL por `DATABASE_URL` e respeita a porta fornecida pela hospedagem.
+
+### 1. Criar o banco
+
+1. No painel do Koyeb, crie um **Database Service** PostgreSQL.
+2. Copie a connection string fornecida pelo serviço.
+
+### 2. Criar o serviço web
+
+1. Clique em **Create Web Service** e escolha o repositório `vinicius217/nexora-auth`.
+2. Selecione a branch `main` e o método de build por `Dockerfile`.
+3. Escolha a instância gratuita e configure `/health` como health check.
+4. Adicione as variáveis abaixo:
+
+```env
+APP_NAME=Nexora
+ENVIRONMENT=production
+DATABASE_URL=<connection-string-do-postgresql>
+SECRET_KEY=<chave-aleatoria-longa>
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+SECURE_COOKIES=true
+DEMO_MODE=true
+DEMO_USER_EMAIL=demo@nexora.dev
+DEMO_USER_NAME=Nexora Demo
+```
+
+Gere uma `SECRET_KEY` localmente com:
+
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(64))"
+```
+
+Após o deploy, abra a URL terminada em `.koyeb.app`. O botão **Acessar demonstração** será exibido automaticamente na tela de login.
+
+### 3. Atualizar o portfólio
+
+Use a URL pública no botão principal do projeto e mantenha o GitHub como ação secundária:
+
+```html
+<a href="https://SEU-SERVICO.koyeb.app" target="_blank" rel="noopener noreferrer">
+  Abrir demonstração →
+</a>
+```
 
 ## Segurança em produção
 

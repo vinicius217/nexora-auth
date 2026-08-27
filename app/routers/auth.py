@@ -8,6 +8,7 @@ from app.core.security import decodificar_token, criar_access_token, criar_refre
 from app.models.usuario import Usuario
 from app.schemas.usuario import *
 from app.services.auth_service import AuthService
+from app.services.demo_service import ensure_demo_user, is_demo_user
 from collections import defaultdict
 import time
 
@@ -41,6 +42,24 @@ def login(data: LoginRequest, request: Request, response: Response, service: Aut
     return token
 
 
+@router.get("/demo")
+def demo_status():
+    return {"enabled": settings.DEMO_MODE}
+
+
+@router.post("/demo", response_model=Token)
+def demo_login(response: Response, db: Session = Depends(get_db)):
+    usuario = ensure_demo_user(db)
+    if usuario is None:
+        raise HTTPException(404, "A demonstração não está disponível neste ambiente.")
+
+    access = criar_access_token({"sub": usuario.email})
+    refresh = criar_refresh_token({"sub": usuario.email})
+    cookie(response, "access_token", access, settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60)
+    cookie(response, "refresh_token", refresh, settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400)
+    return Token(access_token=access)
+
+
 @router.post("/verificar-email")
 def verificar_email(token: str, db: Session = Depends(get_db)):
     usuario=db.query(Usuario).filter(Usuario.verificacao_token_hash==hash_token(token)).first()
@@ -69,10 +88,14 @@ def eu(usuario_atual: Usuario = Depends(get_current_user)): return usuario_atual
 
 @router.patch("/me", response_model=UsuarioResponse)
 def atualizar_perfil(data: ProfileUpdate, usuario: Usuario = Depends(get_current_user), db: Session = Depends(get_db)):
+    if is_demo_user(usuario):
+        raise HTTPException(403, "O perfil da demonstração é somente leitura.")
     usuario.nome = " ".join(data.nome.strip().split()); usuario.avatar_url = data.avatar_url; db.commit(); db.refresh(usuario); return usuario
 
 @router.post("/alterar-senha")
 def alterar_senha(data: ChangePasswordRequest, usuario: Usuario = Depends(get_current_user), db: Session = Depends(get_db)):
+    if is_demo_user(usuario):
+        raise HTTPException(403, "A senha da demonstração não pode ser alterada.")
     if not verificar_senha(data.senha_atual, usuario.senha_hash): raise HTTPException(400,"Senha atual incorreta.")
     usuario.senha_hash=hash_senha(data.nova_senha); db.commit(); return {"message":"Senha alterada com sucesso."}
 
@@ -80,6 +103,8 @@ def alterar_senha(data: ChangePasswordRequest, usuario: Usuario = Depends(get_cu
 def esqueci_senha(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
     usuario=db.query(Usuario).filter(Usuario.email==data.email).first()
     if not usuario: return {"message":"Se o e-mail estiver cadastrado, enviaremos as instruções."}
+    if is_demo_user(usuario):
+        return {"message":"A conta de demonstração é restaurada automaticamente e não possui senha pública."}
     token=gerar_token_aleatorio(); usuario.reset_token_hash=hash_token(token); usuario.reset_token_expira_em=(datetime.now(timezone.utc)+timedelta(minutes=30)).replace(tzinfo=None); db.commit()
     # Em produção, este token deve ser enviado por e-mail e nunca devolvido na API.
     return {"message":"Solicitação criada. Em ambiente de desenvolvimento, use o token retornado abaixo.", "dev_token":token}
@@ -88,4 +113,5 @@ def esqueci_senha(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
 def resetar_senha(data: ResetPasswordRequest, db: Session = Depends(get_db)):
     token_hash=hash_token(data.token); usuario=db.query(Usuario).filter(Usuario.reset_token_hash==token_hash).first()
     if not usuario: raise HTTPException(400,"Token inválido.")
+    if is_demo_user(usuario): raise HTTPException(403,"A senha da demonstração não pode ser alterada.")
     usuario.senha_hash=hash_senha(data.nova_senha); usuario.reset_token_hash=None; usuario.reset_token_expira_em=None; db.commit(); return {"message":"Senha redefinida com sucesso."}
