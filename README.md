@@ -94,7 +94,7 @@ Os tokens são enviados em cookies `HttpOnly`, reduzindo a exposição ao JavaSc
 ### Windows — PowerShell
 
 ```powershell
-git clone https://github.com/SEU-USUARIO/nexora-auth.git
+git clone https://github.com/vinicius217/nexora-auth.git
 cd nexora-auth
 python -m venv .venv
 .venv\Scripts\Activate.ps1
@@ -112,7 +112,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ### Linux e macOS
 
 ```bash
-git clone https://github.com/SEU-USUARIO/nexora-auth.git
+git clone https://github.com/vinicius217/nexora-auth.git
 cd nexora-auth
 python3 -m venv .venv
 source .venv/bin/activate
