@@ -10,4 +10,4 @@ function mostrarToast(texto, tipo="sucesso") { const t=document.createElement("d
 function setLoading(btn, loading, label="Processando...") { btn.disabled=loading; if(loading){btn.dataset.label=btn.textContent;btn.innerHTML='<span class="spinner"></span>'+label}else btn.textContent=btn.dataset.label||btn.textContent; }
 function togglePassword(inputId, button) { const i=document.getElementById(inputId); const hidden=i.type==="password"; i.type=hidden?"text":"password"; button.textContent=hidden?"◌":"◉"; button.setAttribute("aria-label",hidden?"Ocultar senha":"Mostrar senha"); }
 async function getMe(){ try{return await chamarApi("/auth/me")}catch(e){ if(e.message.includes("Sessão")||e.message.includes("credenciais")){try{return await chamarApi("/auth/refresh",{method:"POST"}) && await chamarApi("/auth/me")}catch{return null}} return null }}
-function logout(){ return chamarApi("/auth/logout",{method:"POST"}).finally(()=>location.href="/index.html"); }
+function logout(){ return chamarApi("/auth/logout",{method:"POST"}).finally(()=>location.replace("/index.html")); }

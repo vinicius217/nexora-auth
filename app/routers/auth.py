@@ -59,7 +59,10 @@ def refresh(request: Request, response: Response, db: Session = Depends(get_db))
     return Token(access_token=access)
 
 @router.post("/logout", status_code=204)
-def logout(response: Response): clear(response); return Response(status_code=204)
+def logout(response: Response):
+    clear(response)
+    response.status_code = status.HTTP_204_NO_CONTENT
+    return response
 
 @router.get("/me", response_model=UsuarioResponse)
 def eu(usuario_atual: Usuario = Depends(get_current_user)): return usuario_atual
