@@ -61,11 +61,15 @@ nexora-auth/
 
 ### Inicialização
 
-`app/main.py` cria as tabelas, registra as rotas e monta a pasta `public`. Assim, o mesmo servidor entrega a API e o frontend localmente. Na Vercel, os arquivos públicos também podem ser distribuídos pela CDN.
+`app/main.py` cria as tabelas e registra as rotas. Localmente, o FastAPI monta a pasta `public`; na Vercel, essa pasta é entregue separadamente pela CDN e `/` é direcionado para `index.html`.
 
 ```python
 app.include_router(auth.router)
-app.mount("/", StaticFiles(directory="public", html=True), name="public")
+if os.getenv("VERCEL") == "1":
+    # A Vercel entrega public/ pela CDN.
+    ...
+else:
+    app.mount("/", StaticFiles(directory="public", html=True), name="public")
 ```
 
 ### Configuração e banco

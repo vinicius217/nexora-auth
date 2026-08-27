@@ -1,6 +1,9 @@
 from contextlib import asynccontextmanager
+import os
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.core.database import Base, SessionLocal, engine
@@ -30,5 +33,13 @@ def health_check():
     return {"status": "ok"}
 
 
-# Serve public/ localmente; na Vercel, os mesmos arquivos também podem usar a CDN.
-app.mount("/", StaticFiles(directory="public", html=True), name="public")
+public_dir = Path(__file__).resolve().parent.parent / "public"
+
+if os.getenv("VERCEL") == "1" or not public_dir.is_dir():
+    # A Vercel publica public/ separadamente pela CDN.
+    @app.get("/", include_in_schema=False)
+    def index():
+        return RedirectResponse("/index.html")
+else:
+    # No desenvolvimento local, o próprio FastAPI entrega o frontend.
+    app.mount("/", StaticFiles(directory=public_dir, html=True), name="public")
