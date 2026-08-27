@@ -1,11 +1,14 @@
-from pydantic import model_validator
+from pydantic import AliasChoices, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     APP_NAME: str = "Nexora"
     ENVIRONMENT: str = "development"
-    DATABASE_URL: str = "sqlite:///./login.db"
+    DATABASE_URL: str = Field(
+        default="sqlite:///./login.db",
+        validation_alias=AliasChoices("NEON_URL", "DATABASE_URL"),
+    )
     SECRET_KEY: str = "troque-essa-chave-no-.env-antes-de-ir-pra-producao"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
