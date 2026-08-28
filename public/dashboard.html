@@ -491,8 +491,16 @@
           .toUpperCase();
       }
       function setAvatar(el, u) {
+        el.replaceChildren();
         if (u.avatar_url) {
-          el.innerHTML = `<img src="${u.avatar_url}" alt="Avatar">`;
+          const img = document.createElement("img");
+          img.src = u.avatar_url;
+          img.alt = `Avatar de ${u.nome}`;
+          img.referrerPolicy = "no-referrer";
+          img.addEventListener("error", () => {
+            el.replaceChildren(document.createTextNode(iniciais(u.nome)));
+          });
+          el.appendChild(img);
         } else {
           el.textContent = iniciais(u.nome);
         }

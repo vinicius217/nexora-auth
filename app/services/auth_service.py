@@ -20,6 +20,8 @@ class AuthService:
         invalid = HTTPException(401, "E-mail ou senha inválidos.", headers={"WWW-Authenticate":"Bearer"})
         if not usuario or not verificar_senha(data.senha, usuario.senha_hash): raise invalid
         if not usuario.ativo: raise HTTPException(403, "Usuário desativado.")
+        if not usuario.email_verificado:
+            raise HTTPException(403, "Confirme seu e-mail antes de entrar.")
         usuario.ultimo_login = datetime.now(timezone.utc); self.db.commit()
         access = criar_access_token({"sub":usuario.email}); refresh = criar_refresh_token({"sub":usuario.email})
         return Token(access_token=access), refresh

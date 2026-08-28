@@ -126,6 +126,15 @@
     </main>
     <script src="/js/api.js"></script>
     <script>
+      const resetToken = new URLSearchParams(location.search).get("token");
+      if (resetToken) {
+        form.hidden = true;
+        resetForm.hidden = false;
+        token.value = resetToken;
+        titulo.textContent = "Crie uma nova senha";
+        descricao.textContent =
+          "Escolha uma senha forte e exclusiva para sua conta.";
+      }
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         setLoading(btn, true, "Enviando...");

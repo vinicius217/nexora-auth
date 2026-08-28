@@ -3,8 +3,10 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi import Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
 
 from app.core.database import Base, SessionLocal, engine
 from app.routers import auth
@@ -28,9 +30,30 @@ app = FastAPI(
 app.include_router(auth.router)
 
 
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "img-src 'self' https: data:; "
+        "connect-src 'self'; object-src 'none'; base-uri 'self'; "
+        "frame-ancestors 'none'; form-action 'self'"
+    )
+    return response
+
+
 @app.get("/health", tags=["Infraestrutura"])
 def health_check():
-    return {"status": "ok"}
+    with engine.connect() as connection:
+        connection.execute(text("SELECT 1"))
+    return {"status": "ok", "database": "connected"}
 
 
 public_dir = Path(__file__).resolve().parent.parent / "public"

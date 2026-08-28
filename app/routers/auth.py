@@ -9,7 +9,7 @@ from app.models.usuario import Usuario
 from app.schemas.usuario import *
 from app.services.auth_service import AuthService
 from app.services.demo_service import ensure_demo_user, is_demo_user
-from app.services.email_service import EmailConfigurationError, enviar_email_verificacao
+from app.services.email_service import EmailConfigurationError, enviar_email_recuperacao, enviar_email_verificacao
 from collections import defaultdict
 from typing import Optional
 import smtplib
@@ -119,7 +119,7 @@ def eu(usuario_atual: Usuario = Depends(get_current_user)): return usuario_atual
 def atualizar_perfil(data: ProfileUpdate, usuario: Usuario = Depends(get_current_user), db: Session = Depends(get_db)):
     if is_demo_user(usuario):
         raise HTTPException(403, "O perfil da demonstração é somente leitura.")
-    usuario.nome = " ".join(data.nome.strip().split()); usuario.avatar_url = data.avatar_url; db.commit(); db.refresh(usuario); return usuario
+    usuario.nome = " ".join(data.nome.strip().split()); usuario.avatar_url = str(data.avatar_url) if data.avatar_url else None; db.commit(); db.refresh(usuario); return usuario
 
 @router.post("/alterar-senha")
 def alterar_senha(data: ChangePasswordRequest, usuario: Usuario = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -135,8 +135,17 @@ def esqueci_senha(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
     if is_demo_user(usuario):
         return {"message":"A conta de demonstração é restaurada automaticamente e não possui senha pública."}
     token=gerar_token_aleatorio(); usuario.reset_token_hash=hash_token(token); usuario.reset_token_expira_em=(datetime.now(timezone.utc)+timedelta(minutes=30)).replace(tzinfo=None); db.commit()
-    # Em produção, este token deve ser enviado por e-mail e nunca devolvido na API.
-    return {"message":"Solicitação criada. Em ambiente de desenvolvimento, use o token retornado abaixo.", "dev_token":token}
+    resposta = {"message":"Se o e-mail estiver cadastrado, enviaremos as instruções de recuperação."}
+    if settings.EMAIL_DEV_MODE:
+        resposta["message"] = "Solicitação criada. Use o código de desenvolvimento retornado abaixo."
+        resposta["dev_token"] = token
+    else:
+        try:
+            enviar_email_recuperacao(usuario.email, usuario.nome, token)
+        except (EmailConfigurationError, OSError, smtplib.SMTPException):
+            # Mantém uma resposta neutra para não revelar contas cadastradas.
+            pass
+    return resposta
 
 @router.post("/resetar-senha")
 def resetar_senha(data: ResetPasswordRequest, db: Session = Depends(get_db)):

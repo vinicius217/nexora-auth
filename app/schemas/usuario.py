@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr, ConfigDict, Field, field_validator
+from pydantic import BaseModel, EmailStr, HttpUrl, ConfigDict, Field, field_validator
 
 class UsuarioCreate(BaseModel):
     nome: str = Field(min_length=2, max_length=120)
@@ -38,7 +38,7 @@ class ChangePasswordRequest(BaseModel):
     nova_senha: str = Field(min_length=8, max_length=72)
 class ProfileUpdate(BaseModel):
     nome: str = Field(min_length=2, max_length=120)
-    avatar_url: Optional[str] = Field(default=None, max_length=500)
+    avatar_url: Optional[HttpUrl] = Field(default=None, max_length=500)
 
 class RegistroResponse(BaseModel):
     usuario: UsuarioResponse
