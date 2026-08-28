@@ -21,7 +21,15 @@ class Settings(BaseSettings):
     DEMO_MODE: bool = False
     DEMO_USER_EMAIL: str = "demo@nexora.dev"
     DEMO_USER_NAME: str = "Nexora Demo"
-
+    APP_URL: str = "http://localhost:8000"
+    EMAIL_DEV_MODE: bool = True
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = ""
+    SMTP_FROM_NAME: str = "Nexora"
+    SMTP_USE_TLS: bool = True
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @model_validator(mode="after")

@@ -9,7 +9,10 @@ from app.models.usuario import Usuario
 from app.schemas.usuario import *
 from app.services.auth_service import AuthService
 from app.services.demo_service import ensure_demo_user, is_demo_user
+from app.services.email_service import EmailConfigurationError, enviar_email_verificacao
 from collections import defaultdict
+from typing import Optional
+import smtplib
 import time
 
 _login_attempts = defaultdict(list)
@@ -22,7 +25,7 @@ def check_login_rate_limit(request: Request):
 
 router = APIRouter(prefix="/auth", tags=["Autenticação"])
 def get_service(db: Session = Depends(get_db)): return AuthService(db)
-def cookie(response: Response, name: str, value: str, max_age: int):
+def cookie(response: Response, name: str, value: str, max_age: Optional[int] = None):
     response.set_cookie(name, value, max_age=max_age, httponly=True, secure=settings.SECURE_COOKIES, samesite="lax", path="/")
 
 def clear(response: Response):
@@ -31,14 +34,20 @@ def clear(response: Response):
 @router.post("/registrar", response_model=RegistroResponse, status_code=201)
 def registrar(data: UsuarioCreate, service: AuthService = Depends(get_service)):
     usuario, token = service.registrar(data)
-    return {"usuario": usuario, "dev_verification_token": token}
+    try:
+        enviado = enviar_email_verificacao(usuario.email, usuario.nome, token)
+    except (EmailConfigurationError, OSError, smtplib.SMTPException):
+        enviado = False
+    return {"usuario": usuario, "dev_verification_token": token if settings.EMAIL_DEV_MODE else None, "email_enviado": enviado}
 
 @router.post("/login", response_model=Token)
 def login(data: LoginRequest, request: Request, response: Response, service: AuthService = Depends(get_service)):
     check_login_rate_limit(request)
-    token, refresh = service.login(data); days = settings.REFRESH_TOKEN_EXPIRE_DAYS if data.lembrar_me else 0
-    cookie(response,"access_token",token.access_token, settings.ACCESS_TOKEN_EXPIRE_MINUTES*60 if days else 0)
-    cookie(response,"refresh_token",refresh, days*86400 if days else settings.REFRESH_TOKEN_EXPIRE_DAYS*86400)
+    token, refresh = service.login(data)
+    access_age = settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60 if data.lembrar_me else None
+    refresh_age = settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400 if data.lembrar_me else None
+    cookie(response,"access_token",token.access_token,access_age)
+    cookie(response,"refresh_token",refresh,refresh_age)
     return token
 
 
@@ -67,6 +76,26 @@ def verificar_email(token: str, db: Session = Depends(get_db)):
         raise HTTPException(400, "Token de verificação inválido ou expirado.")
     usuario.email_verificado=True; usuario.verificacao_token_hash=None; usuario.verificacao_token_expira_em=None; db.commit()
     return {"message":"E-mail verificado com sucesso."}
+
+@router.post("/reenviar-verificacao")
+def reenviar_verificacao(data: ResendVerificationRequest, db: Session = Depends(get_db)):
+    usuario = db.query(Usuario).filter(Usuario.email == data.email).first()
+    resposta = {"message": "Se a conta existir e ainda estiver pendente, enviaremos um novo link."}
+    if not usuario or usuario.email_verificado:
+        return resposta
+    token = gerar_token_aleatorio()
+    usuario.verificacao_token_hash = hash_token(token)
+    usuario.verificacao_token_expira_em = (datetime.now(timezone.utc) + timedelta(hours=24)).replace(tzinfo=None)
+    db.commit()
+    try:
+        enviado = enviar_email_verificacao(usuario.email, usuario.nome, token)
+    except EmailConfigurationError as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except (OSError, smtplib.SMTPException) as exc:
+        raise HTTPException(502, "Não foi possível enviar o e-mail. Tente novamente em instantes.") from exc
+    if not enviado:
+        resposta["dev_verification_token"] = token
+    return resposta
 
 @router.post("/refresh", response_model=Token)
 def refresh(request: Request, response: Response, db: Session = Depends(get_db)):
@@ -112,6 +141,8 @@ def esqueci_senha(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
 @router.post("/resetar-senha")
 def resetar_senha(data: ResetPasswordRequest, db: Session = Depends(get_db)):
     token_hash=hash_token(data.token); usuario=db.query(Usuario).filter(Usuario.reset_token_hash==token_hash).first()
-    if not usuario: raise HTTPException(400,"Token inválido.")
+    agora = datetime.now(timezone.utc).replace(tzinfo=None)
+    if not usuario or not usuario.reset_token_expira_em or usuario.reset_token_expira_em < agora:
+        raise HTTPException(400,"Token inválido ou expirado.")
     if is_demo_user(usuario): raise HTTPException(403,"A senha da demonstração não pode ser alterada.")
     usuario.senha_hash=hash_senha(data.nova_senha); usuario.reset_token_hash=None; usuario.reset_token_expira_em=None; db.commit(); return {"message":"Senha redefinida com sucesso."}

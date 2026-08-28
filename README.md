@@ -9,6 +9,7 @@ Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e JavaS
 - Access token e refresh token armazenados em cookies `HttpOnly`.
 - Renovação automática da sessão e logout seguro.
 - Verificação de e-mail simulada em desenvolvimento.
+- Reenvio de verificação e tela de confirmação com feedback visual.
 - Recuperação e redefinição de senha por token.
 - Edição de nome, avatar e senha.
 - Dashboard responsivo com navegação mobile.
@@ -48,6 +49,7 @@ nexora-auth/
 │   ├── index.html             # Login
 │   ├── cadastro.html          # Cadastro
 │   ├── recuperar.html         # Recuperação de senha
+│   ├── verificar.html         # Confirmação de e-mail
 │   └── dashboard.html         # Área autenticada
 ├── .env.example
 ├── .python-version
@@ -170,6 +172,24 @@ DEMO_USER_NAME=Nexora Demo
 | `DEMO_USER_EMAIL` | E-mail interno da conta demonstrativa |
 | `DEMO_USER_NAME` | Nome exibido na conta demonstrativa |
 
+### Envio real de e-mail
+
+Para enviar a confirmação ao endereço cadastrado, configure no `.env`:
+
+```env
+APP_URL=http://localhost:8000
+EMAIL_DEV_MODE=false
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=seu-email@gmail.com
+SMTP_PASSWORD=sua-senha-de-app
+SMTP_FROM_EMAIL=seu-email@gmail.com
+SMTP_FROM_NAME=Nexora
+SMTP_USE_TLS=true
+```
+
+No Gmail, use uma senha de app, não a senha normal da conta. Enquanto `EMAIL_DEV_MODE=true`, o projeto mantém o atalho local de desenvolvimento e não envia mensagens reais.
+
 ## Endpoints principais
 
 | Método | Rota | Descrição |
@@ -187,6 +207,7 @@ DEMO_USER_NAME=Nexora Demo
 | `POST` | `/auth/resetar-senha` | Redefine a senha pelo token |
 | `POST` | `/auth/verificar-email` | Confirma o e-mail pelo token |
 | `GET` | `/health` | Verifica a disponibilidade do serviço |
+| `POST` | `/auth/reenviar-verificacao` | Gera um novo token de confirmação |
 
 ## Publicar na Vercel
 

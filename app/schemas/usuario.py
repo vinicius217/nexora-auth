@@ -29,6 +29,7 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 class ForgotPasswordRequest(BaseModel): email: EmailStr
+class ResendVerificationRequest(BaseModel): email: EmailStr
 class ResetPasswordRequest(BaseModel):
     token: str = Field(min_length=20)
     nova_senha: str = Field(min_length=8, max_length=72)
@@ -42,3 +43,4 @@ class ProfileUpdate(BaseModel):
 class RegistroResponse(BaseModel):
     usuario: UsuarioResponse
     dev_verification_token: Optional[str] = None
+    email_enviado: bool = False
