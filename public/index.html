@@ -3,9 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#080b14" />
+    <meta name="theme-color" content="#111310" />
     <title>Nexora — Entrar</title>
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/assets/login-button.css" />
   </head>
   <body class="auth-page">
     <div class="ambient" aria-hidden="true"></div>
@@ -110,10 +111,7 @@
               <input id="lembrar" type="checkbox" />
               <span>Lembrar de mim neste dispositivo</span>
             </label>
-            <button class="btn auth-submit" id="btn-login">
-              Entrar na conta
-              <span>→</span>
-            </button>
+            <div id="login-button-root" class="login-button-root"></div>
             <div
               id="mensagem"
               class="mensagem"
@@ -133,6 +131,7 @@
       </section>
     </main>
     <script src="/js/api.js"></script>
+    <script type="module" src="/assets/login-button.js"></script>
     <script>
       getMe().then((u) => {
         if (u) location.href = "/dashboard.html";
@@ -152,6 +151,7 @@
                 lembrar_me: lembrar.checked,
               }),
             });
+            b.classList.add("is-success");
             mostrarToast("Login realizado com sucesso!");
             setTimeout(() => (location.href = "/dashboard.html"), 350);
           } catch (err) {

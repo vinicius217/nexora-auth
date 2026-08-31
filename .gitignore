@@ -20,3 +20,5 @@ htmlcov/
 Thumbs.db
 
 .vercel
+.chrome-check/
+node_modules/
