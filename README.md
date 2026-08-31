@@ -1,18 +1,21 @@
 # Nexora — Secure Identity
 
-Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e JavaScript puro. O projeto reúne cadastro, login, recuperação de senha, edição de perfil e um dashboard responsivo em uma interface moderna.
+Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e uma interface híbrida em HTML, JavaScript e React. O projeto reúne cadastro, login, recuperação de senha, edição de perfil e um dashboard responsivo com identidade visual própria.
+
+**Deploy:** [nexora-auth-fs7qppwad-vinciius.vercel.app](https://nexora-auth-fs7qppwad-vinciius.vercel.app)
 
 ## Funcionalidades
 
-- Cadastro com confirmação e indicador de força da senha.
+- Cadastro direto com indicador de força da senha.
 - Login com limite básico de tentativas.
 - Access token e refresh token armazenados em cookies `HttpOnly`.
 - Renovação automática da sessão e logout seguro.
-- Verificação de e-mail simulada em desenvolvimento.
-- Reenvio de verificação e tela de confirmação com feedback visual.
 - Recuperação e redefinição de senha por token.
 - Edição de nome, avatar e senha.
 - Dashboard responsivo com navegação mobile.
+- Botão de login animado construído como componente React + TypeScript.
+- Tailwind CSS isolado ao componente React para não interferir nas páginas existentes.
+- Identidade visual em grafite, marfim e verde-musgo, com símbolo próprio da Nexora.
 - Modo de demonstração somente leitura para recrutadores.
 - Health check para monitoramento da aplicação.
 - Documentação interativa da API com Swagger.
@@ -25,7 +28,8 @@ Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e JavaS
 | Banco de dados | SQLite, PostgreSQL e SQLAlchemy |
 | Validação | Pydantic |
 | Segurança | JWT, bcrypt e cookies HttpOnly |
-| Frontend | HTML5, CSS3 e JavaScript puro |
+| Frontend | HTML5, CSS3, JavaScript, React, TypeScript e Tailwind CSS |
+| Build frontend | Vite |
 
 ## Estrutura do projeto
 
@@ -46,15 +50,23 @@ nexora-auth/
 ├── public/
 │   ├── css/style.css          # Design e responsividade
 │   ├── js/api.js              # Cliente HTTP da interface
+│   ├── assets/                # Bundle React gerado pelo Vite
 │   ├── index.html             # Login
 │   ├── cadastro.html          # Cadastro
 │   ├── recuperar.html         # Recuperação de senha
-│   ├── verificar.html         # Confirmação de e-mail
 │   └── dashboard.html         # Área autenticada
+├── src/
+│   ├── components/ui/         # Componentes React reutilizáveis
+│   ├── lib/                   # Utilitários do frontend
+│   ├── styles/                # Tailwind e estilos do componente
+│   └── main.tsx               # Ponto de entrada React
 ├── .env.example
 ├── .python-version
 ├── Dockerfile
+├── package.json
 ├── requirements.txt
+├── tsconfig.json
+├── vite.config.ts
 ├── vercel.json
 └── README.md
 ```
@@ -95,11 +107,14 @@ Os tokens são enviados em cookies `HttpOnly`, reduzindo a exposição ao JavaSc
 
 `public/css/style.css` contém o design system, os componentes, o dashboard, os breakpoints responsivos e o suporte a movimento reduzido.
 
+O React é usado somente no botão animado de login, montado em `#login-button-root`. O componente fica em `src/components/ui/3d-button.tsx`; Vite e Tailwind geram os arquivos de `public/assets/`, que são servidos pelo mesmo FastAPI.
+
 ## Como executar
 
 ### Pré-requisitos
 
 - Python 3.11 ou superior.
+- Node.js 20 ou superior.
 - Git para clonar o repositório.
 
 ### Windows — PowerShell
@@ -110,6 +125,8 @@ cd nexora-auth
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+npm install
+npm run build
 Copy-Item .env.example .env
 python -m uvicorn app.main:app --reload
 ```
@@ -128,6 +145,8 @@ cd nexora-auth
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+npm install
+npm run build
 cp .env.example .env
 python -m uvicorn app.main:app --reload
 ```
@@ -172,9 +191,9 @@ DEMO_USER_NAME=Nexora Demo
 | `DEMO_USER_EMAIL` | E-mail interno da conta demonstrativa |
 | `DEMO_USER_NAME` | Nome exibido na conta demonstrativa |
 
-### Envio real de e-mail
+### Envio de recuperação de senha
 
-Para enviar a confirmação ao endereço cadastrado, configure no `.env`:
+O cadastro e o login não exigem confirmação de e-mail. Para enviar links reais de recuperação de senha, configure no `.env`:
 
 ```env
 APP_URL=http://localhost:8000
@@ -188,7 +207,7 @@ SMTP_FROM_NAME=Nexora
 SMTP_USE_TLS=true
 ```
 
-No Gmail, use uma senha de app, não a senha normal da conta. Enquanto `EMAIL_DEV_MODE=true`, o projeto mantém o atalho local de desenvolvimento e não envia mensagens reais.
+No Gmail, use uma senha de app, não a senha normal da conta. Enquanto `EMAIL_DEV_MODE=true`, nenhuma mensagem real será enviada.
 
 ## Endpoints principais
 
@@ -205,9 +224,7 @@ No Gmail, use uma senha de app, não a senha normal da conta. Enquanto `EMAIL_DE
 | `POST` | `/auth/alterar-senha` | Altera a senha autenticada |
 | `POST` | `/auth/esqueci-senha` | Cria um token de recuperação |
 | `POST` | `/auth/resetar-senha` | Redefine a senha pelo token |
-| `POST` | `/auth/verificar-email` | Confirma o e-mail pelo token |
 | `GET` | `/health` | Verifica a disponibilidade do serviço |
-| `POST` | `/auth/reenviar-verificacao` | Gera um novo token de confirmação |
 
 ## Publicar na Vercel
 
@@ -217,7 +234,7 @@ O projeto usa um ponto de entrada FastAPI reconhecido pela Vercel, inclui os arq
 
 1. Acesse `https://vercel.com/new` e conecte sua conta do GitHub.
 2. Importe o repositório `vinicius217/nexora-auth`.
-3. Mantenha o diretório raiz e as configurações de build detectadas automaticamente.
+3. Mantenha o diretório raiz. Os assets React já são gerados em `public/assets/`; para alterações no componente, execute `npm run build` antes do deploy.
 
 ### 2. Criar o banco Neon
 
@@ -273,7 +290,7 @@ Antes de publicar em produção:
 1. Use uma `SECRET_KEY` longa, aleatória e exclusiva.
 2. Troque SQLite por PostgreSQL ou outro banco de produção.
 3. Ative `SECURE_COOKIES=true` sob HTTPS.
-4. Envie tokens de verificação e recuperação por e-mail; não os devolva na API.
+4. Envie tokens de recuperação por e-mail; não os devolva na API em produção.
 5. Troque o rate limit em memória por Redis ou middleware dedicado.
 6. Restrinja CORS, use migrações com Alembic e adicione testes automatizados.
 
