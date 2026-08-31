@@ -136,6 +136,9 @@
       getMe().then((u) => {
         if (u) location.href = "/dashboard.html";
       });
+      if (new URLSearchParams(location.search).get("registered") === "1") {
+        mostrarToast("Conta criada. Agora você já pode entrar.");
+      }
       document
         .getElementById("form-login")
         .addEventListener("submit", async (e) => {
@@ -156,14 +159,6 @@
             setTimeout(() => (location.href = "/dashboard.html"), 350);
           } catch (err) {
             mostrarMensagem(mensagem, err.message, "erro");
-            if (err.message.includes("Confirme seu e-mail")) {
-              sessionStorage.setItem("pendingVerificationEmail", email.value);
-              const link = document.createElement("a");
-              link.href = `/verificar.html?email=${encodeURIComponent(email.value)}`;
-              link.textContent = "Reenviar confirmação";
-              link.className = "message-action";
-              mensagem.append(document.createElement("br"), link);
-            }
           } finally {
             setLoading(b, false);
           }

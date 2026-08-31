@@ -201,14 +201,7 @@
                 confirmar_senha: confirmar.value,
               }),
             });
-            sessionStorage.setItem("pendingVerificationEmail", email.value);
-            const q = new URLSearchParams({
-              email: email.value,
-              enviado: String(r.email_enviado),
-            });
-            if (r.dev_verification_token)
-              q.set("token", r.dev_verification_token);
-            location.href = "/verificar.html?" + q;
+            location.href = "/index.html?registered=1";
           } catch (err) {
             mostrarMensagem(mensagem, err.message, "erro");
           } finally {

@@ -33,12 +33,8 @@ def clear(response: Response):
 
 @router.post("/registrar", response_model=RegistroResponse, status_code=201)
 def registrar(data: UsuarioCreate, service: AuthService = Depends(get_service)):
-    usuario, token = service.registrar(data)
-    try:
-        enviado = enviar_email_verificacao(usuario.email, usuario.nome, token)
-    except (EmailConfigurationError, OSError, smtplib.SMTPException):
-        enviado = False
-    return {"usuario": usuario, "dev_verification_token": token if settings.EMAIL_DEV_MODE else None, "email_enviado": enviado}
+    usuario, _ = service.registrar(data)
+    return {"usuario": usuario, "dev_verification_token": None, "email_enviado": False}
 
 @router.post("/login", response_model=Token)
 def login(data: LoginRequest, request: Request, response: Response, service: AuthService = Depends(get_service)):

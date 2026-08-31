@@ -1,6 +1,5 @@
 import unittest
 
-from fastapi import HTTPException
 from pydantic import ValidationError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -26,7 +25,7 @@ class AuthSecurityTests(unittest.TestCase):
         self.session.close()
         self.engine.dispose()
 
-    def test_login_requires_verified_email(self):
+    def test_login_automatically_releases_legacy_unverified_account(self):
         usuario, _ = self.service.registrar(
             UsuarioCreate(
                 nome="Pessoa Teste",
@@ -35,15 +34,13 @@ class AuthSecurityTests(unittest.TestCase):
                 confirmar_senha="Senha@123",
             )
         )
-        with self.assertRaises(HTTPException) as error:
-            self.service.login(LoginRequest(email=usuario.email, senha="Senha@123"))
-        self.assertEqual(error.exception.status_code, 403)
-
-        usuario.email_verificado = True
+        usuario.email_verificado = False
         self.session.commit()
         token, refresh = self.service.login(LoginRequest(email=usuario.email, senha="Senha@123"))
         self.assertTrue(token.access_token)
         self.assertTrue(refresh)
+        self.session.refresh(usuario)
+        self.assertTrue(usuario.email_verificado)
 
     def test_avatar_accepts_only_http_urls(self):
         with self.assertRaises(ValidationError):

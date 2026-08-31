@@ -9,7 +9,7 @@ class Usuario(Base):
     email = Column(String(120), unique=True, index=True, nullable=False)
     senha_hash = Column(String(255), nullable=False)
     ativo = Column(Boolean, default=True, nullable=False)
-    email_verificado = Column(Boolean, default=False, nullable=False)
+    email_verificado = Column(Boolean, default=True, nullable=False)
     avatar_url = Column(String(500), nullable=True)
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
     ultimo_login = Column(DateTime(timezone=True), nullable=True)

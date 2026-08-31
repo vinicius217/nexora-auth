@@ -118,20 +118,6 @@
           </div>
         </section>
 
-        <section class="verification-banner" id="verificationBanner" hidden>
-          <div class="verification-banner-icon">✉</div>
-          <div>
-            <strong>Confirme seu endereço de e-mail</strong>
-            <p>
-              Adicione uma camada extra de segurança e conclua a configuração da
-              conta.
-            </p>
-          </div>
-          <button class="secondary-btn" id="resendVerification">
-            Reenviar link
-          </button>
-        </section>
-
         <section class="stats-grid">
           <article class="metric-card">
             <div class="metric-icon">✓</div>
@@ -147,7 +133,7 @@
             <div class="metric-copy">
               <span>E-mail</span>
               <strong id="metricEmail">Carregando...</strong>
-              <small id="metricVerified">Verificando status</small>
+              <small>Endereço da conta</small>
             </div>
           </article>
           <article class="metric-card">
@@ -189,7 +175,7 @@
                   <p id="email">...</p>
                   <div class="profile-tags">
                     <span class="tag green">● Conta ativa</span>
-                    <span class="tag" id="emailTag">E-mail pendente</span>
+                    <span class="tag">E-mail cadastrado</span>
                   </div>
                 </div>
               </div>
@@ -274,14 +260,6 @@
                     <span>Proteção principal da sua conta</span>
                   </div>
                   <span class="security-state success">Configurada</span>
-                </div>
-                <div class="security-item">
-                  <div class="security-icon">✉</div>
-                  <div>
-                    <strong>Verificação de e-mail</strong>
-                    <span id="verificationDescription">Verificando...</span>
-                  </div>
-                  <span class="security-state" id="verificado">—</span>
                 </div>
                 <div class="security-item">
                   <div class="security-icon">⌁</div>
@@ -536,23 +514,8 @@
           : "Sua sessão atual foi autenticada.";
         $("sessionTime").textContent = fmtRelative(u.ultimo_login);
 
-        const verified = !!u.email_verificado;
-        $("verificado").textContent = verified ? "Verificado" : "Pendente";
-        $("verificado").className =
-          `security-state ${verified ? "success" : "warning"}`;
-        $("metricVerified").textContent = verified
-          ? "E-mail verificado"
-          : "Verificação pendente";
-        $("verificationDescription").textContent = verified
-          ? "Seu e-mail foi confirmado"
-          : "Confirme seu endereço de e-mail";
-        $("emailTag").textContent = verified
-          ? "✓ E-mail verificado"
-          : "! E-mail pendente";
-        $("emailTag").className = `tag ${verified ? "green" : "warning"}`;
-        $("securityScore").textContent = verified ? "100" : "85";
-        $("securityLabel").textContent = verified ? "Excelente" : "Muito bom";
-        $("verificationBanner").hidden = verified;
+        $("securityScore").textContent = "100";
+        $("securityLabel").textContent = "Excelente";
 
         [$("avatar"), $("avatar2")].forEach((a) => setAvatar(a, u));
         $("novoNome").value = u.nome;
@@ -594,29 +557,6 @@
       );
       $("refreshDashboard").addEventListener("click", () => init(true));
       $("quickRefresh").addEventListener("click", () => init(true));
-      $("resendVerification").addEventListener("click", async () => {
-        const b = $("resendVerification");
-        setLoading(b, true, "Enviando...");
-        try {
-          const r = await chamarApi("/auth/reenviar-verificacao", {
-            method: "POST",
-            body: JSON.stringify({ email: usuarioAtual.email }),
-          });
-          if (r.dev_verification_token) {
-            const q = new URLSearchParams({
-              email: usuarioAtual.email,
-              token: r.dev_verification_token,
-            });
-            location.href = "/verificar.html?" + q;
-            return;
-          }
-          mostrarToast(r.message);
-        } catch (e) {
-          mostrarToast(e.message, "erro");
-        } finally {
-          setLoading(b, false);
-        }
-      });
       document
         .querySelectorAll("[data-close]")
         .forEach((b) =>
