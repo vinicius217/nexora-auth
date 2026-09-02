@@ -44,3 +44,12 @@ class RegistroResponse(BaseModel):
     usuario: UsuarioResponse
     dev_verification_token: Optional[str] = None
     email_enviado: bool = False
+
+class SessionResponse(BaseModel):
+    id: int
+    user_agent: Optional[str] = None
+    ip_address: Optional[str] = None
+    criada_em: datetime
+    ultima_atividade_em: datetime
+    expira_em: datetime
+    atual: bool = False

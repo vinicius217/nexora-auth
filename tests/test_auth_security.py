@@ -1,4 +1,5 @@
 import unittest
+from fastapi import HTTPException
 
 from pydantic import ValidationError
 from sqlalchemy import create_engine
@@ -8,6 +9,7 @@ from sqlalchemy.pool import StaticPool
 from app.core.database import Base
 from app.schemas.usuario import LoginRequest, ProfileUpdate, UsuarioCreate
 from app.services.auth_service import AuthService
+from app.core.rate_limit import RateLimiter
 
 
 class AuthSecurityTests(unittest.TestCase):
@@ -25,8 +27,8 @@ class AuthSecurityTests(unittest.TestCase):
         self.session.close()
         self.engine.dispose()
 
-    def test_login_automatically_releases_legacy_unverified_account(self):
-        usuario, _ = self.service.registrar(
+    def test_login_requires_verified_email(self):
+        usuario, token_verificacao = self.service.registrar(
             UsuarioCreate(
                 nome="Pessoa Teste",
                 email="pessoa@example.com",
@@ -34,13 +36,16 @@ class AuthSecurityTests(unittest.TestCase):
                 confirmar_senha="Senha@123",
             )
         )
-        usuario.email_verificado = False
-        self.session.commit()
-        token, refresh = self.service.login(LoginRequest(email=usuario.email, senha="Senha@123"))
-        self.assertTrue(token.access_token)
-        self.assertTrue(refresh)
-        self.session.refresh(usuario)
-        self.assertTrue(usuario.email_verificado)
+        self.assertTrue(token_verificacao)
+        self.assertFalse(usuario.email_verificado)
+        with self.assertRaises(HTTPException) as contexto:
+            self.service.login(LoginRequest(email=usuario.email, senha="Senha@123"))
+        self.assertEqual(contexto.exception.status_code, 403)
+
+    def test_registration_rejects_repeated_password_pattern(self):
+        with self.assertRaises(HTTPException) as contexto:
+            self.service.registrar(UsuarioCreate(nome="Pessoa Teste", email="fraca@example.com", senha="aaaaaaaa", confirmar_senha="aaaaaaaa"))
+        self.assertEqual(contexto.exception.status_code, 400)
 
     def test_avatar_accepts_only_http_urls(self):
         with self.assertRaises(ValidationError):
@@ -48,6 +53,15 @@ class AuthSecurityTests(unittest.TestCase):
 
         perfil = ProfileUpdate(nome="Pessoa Teste", avatar_url="https://example.com/avatar.png")
         self.assertEqual(perfil.avatar_url.scheme, "https")
+
+    def test_rate_limiter_rejects_after_limit(self):
+        limiter = RateLimiter()
+        limiter.check("login:test", 2, 60)
+        limiter.check("login:test", 2, 60)
+        with self.assertRaises(HTTPException) as contexto:
+            limiter.check("login:test", 2, 60)
+        self.assertEqual(contexto.exception.status_code, 429)
+        self.assertIn("Retry-After", contexto.exception.headers)
 
 
 if __name__ == "__main__":

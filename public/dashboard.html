@@ -318,7 +318,7 @@
                 </div>
                 <span class="tag green">● Você</span>
               </div>
-              <div class="device-row">
+              <div class="device-row" id="currentSession">
                 <div class="device-icon">▣</div>
                 <div>
                   <strong id="deviceName">Navegador atual</strong>
@@ -329,6 +329,7 @@
                 <span>Última autenticação</span>
                 <strong id="sessionTime">Agora</strong>
               </div>
+              <div id="otherSessions"></div>
             </article>
           </div>
         </section>
@@ -545,7 +546,39 @@
           return;
         }
         renderDashboard(u);
+        await renderSessions();
         if (showFeedback) mostrarToast("Dashboard atualizado");
+      }
+
+      async function renderSessions() {
+        const sessions = await chamarApi("/auth/sessoes").catch(() => []);
+        const current = sessions.find((session) => session.atual);
+        if (current) {
+          $("sessionTime").textContent = fmtRelative(current.ultima_atividade_em);
+          $("deviceInfo").textContent = `${current.ip_address || "IP protegido"} • Sessão atual`;
+        }
+        const container = $("otherSessions");
+        container.replaceChildren();
+        sessions.filter((session) => !session.atual).forEach((session) => {
+          const row = document.createElement("div");
+          row.className = "device-row";
+          const copy = document.createElement("div");
+          const title = document.createElement("strong");
+          title.textContent = "Outro dispositivo";
+          const detail = document.createElement("span");
+          detail.textContent = `${session.ip_address || "IP protegido"} • ${fmtRelative(session.ultima_atividade_em)}`;
+          copy.append(title, detail);
+          const revoke = document.createElement("button");
+          revoke.className = "secondary-btn";
+          revoke.textContent = "Encerrar";
+          revoke.addEventListener("click", async () => {
+            await chamarApi(`/auth/sessoes/${session.id}`, { method: "DELETE" });
+            mostrarToast("Sessão encerrada");
+            await renderSessions();
+          });
+          row.append(copy, revoke);
+          container.appendChild(row);
+        });
       }
 
       $("sair").addEventListener("click", () => logout());
