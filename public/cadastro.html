@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#111310" />
+    <title>Nexora — Criar conta</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="auth-page">
+    <div class="ambient"></div>
+    <main class="auth-layout">
+      <section class="auth-showcase">
+        <a class="brand auth-brand" href="/">
+          <span class="logo">N</span>
+          <span class="brand-copy">
+            <b>NEXORA</b>
+            <small>SECURE IDENTITY</small>
+          </span>
+        </a>
+        <div class="showcase-copy">
+          <span class="status-pill">
+            <i></i>
+            Comece agora
+          </span>
+          <h1>
+            Seu espaço digital,
+            <br />
+            <span>mais protegido.</span>
+          </h1>
+          <p>
+            Crie sua conta gratuitamente e tenha uma experiência segura desde o
+            primeiro acesso.
+          </p>
+          <div class="benefit-list">
+            <div>
+              <span class="benefit-icon">✓</span>
+              <p>
+                <strong>Cadastro em segundos</strong>
+                <small>Um fluxo direto e sem etapas desnecessárias.</small>
+              </p>
+            </div>
+            <div>
+              <span class="benefit-icon">◇</span>
+              <p>
+                <strong>Proteção desde o início</strong>
+                <small>Senha forte e sessão segura.</small>
+              </p>
+            </div>
+          </div>
+        </div>
+        <footer class="showcase-footer">
+          <span>© 2026 Nexora</span>
+          <span>Privacidade · Segurança</span>
+        </footer>
+      </section>
+      <section class="auth-form-side">
+        <div class="mobile-brand">
+          <span class="logo">N</span>
+          <b>NEXORA</b>
+        </div>
+        <div class="auth-card auth-card-modern signup-card">
+          <div class="eyebrow">Novo acesso</div>
+          <h2>Crie sua conta</h2>
+          <p class="subtitle">Configure seu perfil em poucos segundos.</p>
+          <form id="form-cadastro">
+            <div class="field">
+              <label for="nome">Nome completo</label>
+              <div class="input-icon-wrap">
+                <span>○</span>
+                <input
+                  id="nome"
+                  autocomplete="name"
+                  placeholder="Como podemos chamar você?"
+                  required
+                  minlength="2"
+                />
+              </div>
+            </div>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <div class="input-icon-wrap">
+                <span>@</span>
+                <input
+                  id="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="voce@exemplo.com"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="senha">Senha</label>
+                <div class="input-icon-wrap">
+                  <span>◇</span>
+                  <input
+                    id="senha"
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder="Mínimo 8 caracteres"
+                    required
+                    minlength="8"
+                  />
+                  <button
+                    class="toggle-pass"
+                    type="button"
+                    onclick="togglePassword('senha', this)"
+                    aria-label="Mostrar senha"
+                  >
+                    ◉
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label for="confirmar">Confirmar senha</label>
+                <div class="input-icon-wrap">
+                  <span>◇</span>
+                  <input
+                    id="confirmar"
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder="Repita sua senha"
+                    required
+                    minlength="8"
+                  />
+                  <button
+                    class="toggle-pass"
+                    type="button"
+                    onclick="togglePassword('confirmar', this)"
+                    aria-label="Mostrar senha"
+                  >
+                    ◉
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="password-meter"><span id="meter"></span></div>
+            <div class="requirements">
+              <span class="req" id="r-len">8+ caracteres</span>
+              <span class="req" id="r-upper">Maiúscula</span>
+              <span class="req" id="r-num">Número</span>
+              <span class="req" id="r-special">Especial</span>
+            </div>
+            <button class="btn auth-submit" id="btn-cadastro">
+              Criar minha conta
+              <span>→</span>
+            </button>
+            <div
+              id="mensagem"
+              class="mensagem"
+              role="status"
+              aria-live="polite"
+            ></div>
+          </form>
+          <div class="link-row">
+            Já possui uma conta?
+            <a href="/index.html">Entrar</a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="/js/api.js"></script>
+    <script>
+      senha.addEventListener("input", () => {
+        let s = senha.value,
+          n =
+            (s.length >= 8) +
+            /[A-Z]/.test(s) +
+            /\d/.test(s) +
+            /[^A-Za-z0-9]/.test(s);
+        meter.style.width = n * 25 + "%";
+        meter.dataset.strength = n;
+        [
+          ["r-len", s.length >= 8],
+          ["r-upper", /[A-Z]/.test(s)],
+          ["r-num", /\d/.test(s)],
+          ["r-special", /[^A-Za-z0-9]/.test(s)],
+        ].forEach(([id, ok]) =>
+          document.getElementById(id).classList.toggle("ok", ok),
+        );
+      });
+      document
+        .getElementById("form-cadastro")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if (senha.value !== confirmar.value) {
+            mostrarMensagem(mensagem, "As senhas não coincidem.", "erro");
+            return;
+          }
+          const b = document.getElementById("btn-cadastro");
+          setLoading(b, true, "Criando conta...");
+          try {
+            const r = await chamarApi("/auth/registrar", {
+              method: "POST",
+              body: JSON.stringify({
+                nome: nome.value,
+                email: email.value,
+                senha: senha.value,
+                confirmar_senha: confirmar.value,
+              }),
+            });
+            sessionStorage.setItem("pendingVerificationEmail", email.value);
+            const q = new URLSearchParams({ email: email.value, enviado: String(r.email_enviado) });
+            if (r.dev_verification_token) q.set("token", r.dev_verification_token);
+            location.href = "/verificar.html?" + q;
+          } catch (err) {
+            mostrarMensagem(mensagem, err.message, "erro");
+          } finally {
+            setLoading(b, false);
+          }
+        });
+    </script>
+  </body>
+</html>

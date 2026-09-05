@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#111310" />
+    <title>Nexora — Verificar e-mail</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="auth-page">
+    <div class="ambient"></div>
+    <main class="auth-layout">
+      <section class="auth-showcase">
+        <a class="brand auth-brand" href="/">
+          <span class="logo">N</span>
+          <span class="brand-copy">
+            <b>NEXORA</b>
+            <small>SECURE IDENTITY</small>
+          </span>
+        </a>
+        <div class="showcase-copy">
+          <span class="status-pill">
+            <i></i>
+            Última etapa
+          </span>
+          <h1>
+            Confirme que
+            <br />
+            <span>é realmente você.</span>
+          </h1>
+          <p>
+            A verificação protege sua identidade e evita que outra pessoa use
+            seu endereço de e-mail.
+          </p>
+          <div class="recovery-visual">
+            <div class="shield">✉</div>
+            <span class="orbit orbit-one"></span>
+            <span class="orbit orbit-two"></span>
+          </div>
+        </div>
+        <footer class="showcase-footer">
+          <span>© 2026 Nexora</span>
+          <span>Privacidade · Segurança</span>
+        </footer>
+      </section>
+      <section class="auth-form-side">
+        <div class="mobile-brand">
+          <span class="logo">N</span>
+          <b>NEXORA</b>
+        </div>
+        <div class="auth-card auth-card-modern verify-card">
+          <div class="verify-icon" id="verifyIcon">✉</div>
+          <div class="eyebrow">Verificação de identidade</div>
+          <h2 id="titulo">Verifique seu e-mail</h2>
+          <p class="subtitle" id="descricao">
+            Use o link enviado para concluir a criação da sua conta.
+          </p>
+          <div
+            id="mensagem"
+            class="mensagem"
+            role="status"
+            aria-live="polite"
+          ></div>
+          <form id="resendForm">
+            <div class="field">
+              <label for="email">E-mail da conta</label>
+              <div class="input-icon-wrap">
+                <span>@</span>
+                <input
+                  id="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="voce@exemplo.com"
+                  required
+                />
+              </div>
+            </div>
+            <button class="btn auth-submit" id="reenviar">
+              Reenviar link
+              <span>→</span>
+            </button>
+          </form>
+          <a class="verify-back" href="/index.html">← Voltar para o login</a>
+        </div>
+      </section>
+    </main>
+    <script src="/js/api.js"></script>
+    <script>
+      const params = new URLSearchParams(location.search),
+        token = params.get("token"),
+        emailInput = document.getElementById("email");
+      emailInput.value =
+        params.get("email") ||
+        sessionStorage.getItem("pendingVerificationEmail") ||
+        "";
+      if (!token && params.get("enviado") === "false") {
+        document.getElementById("descricao").textContent =
+          "Não conseguimos enviar a mensagem. Confira a configuração SMTP e use o botão abaixo para tentar novamente.";
+        mostrarMensagem(
+          document.getElementById("mensagem"),
+          "O e-mail não foi enviado. Tente reenviar.",
+          "erro",
+        );
+      }
+      async function verify() {
+        if (!token) return;
+        setLoading(document.getElementById("reenviar"), true, "Verificando...");
+        try {
+          const r = await chamarApi(
+            "/auth/verificar-email?token=" + encodeURIComponent(token),
+            { method: "POST" },
+          );
+          document.getElementById("verifyIcon").textContent = "✓";
+          document.getElementById("verifyIcon").classList.add("success");
+          document.getElementById("titulo").textContent = "E-mail verificado!";
+          document.getElementById("descricao").textContent =
+            "Sua conta está pronta. Você já pode entrar com segurança.";
+          document.getElementById("resendForm").hidden = true;
+          mostrarMensagem(
+            document.getElementById("mensagem"),
+            r.message,
+            "sucesso",
+          );
+          sessionStorage.removeItem("pendingVerificationEmail");
+          setTimeout(() => (location.href = "/index.html?verified=1"), 1800);
+        } catch (e) {
+          mostrarMensagem(
+            document.getElementById("mensagem"),
+            e.message,
+            "erro",
+          );
+        } finally {
+          setLoading(document.getElementById("reenviar"), false);
+        }
+      }
+      document
+        .getElementById("resendForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const b = document.getElementById("reenviar");
+          setLoading(b, true, "Enviando...");
+          try {
+            const r = await chamarApi("/auth/reenviar-verificacao", {
+              method: "POST",
+              body: JSON.stringify({ email: emailInput.value }),
+            });
+            mostrarMensagem(
+              document.getElementById("mensagem"),
+              r.message,
+              "sucesso",
+            );
+            if (r.dev_verification_token) {
+              const q = new URLSearchParams({
+                email: emailInput.value,
+                token: r.dev_verification_token,
+              });
+              history.replaceState({}, "", location.pathname + "?" + q);
+              mostrarToast(
+                "Link de desenvolvimento gerado. Clique em verificar novamente ou recarregue a página.",
+              );
+            }
+          } catch (e) {
+            mostrarMensagem(
+              document.getElementById("mensagem"),
+              e.message,
+              "erro",
+            );
+          } finally {
+            setLoading(b, false);
+          }
+        });
+      verify();
+    </script>
+  </body>
+</html>

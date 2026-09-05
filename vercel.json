@@ -33,10 +33,5 @@
       "destination": "/index.html"
     }
   ],
-  "buildCommand": "npm ci --include=dev && npm run build",
-  "functions": {
-    "app/main.py": {
-      "includeFiles": "frontend/public/**"
-    }
-  }
+  "buildCommand": "npm ci --include=dev && npm run build"
 }

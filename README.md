@@ -47,7 +47,7 @@ nexora-auth/
 |   |-- tsconfig.json
 |   `-- vite.config.ts
 |-- app/main.py             # Entrada de compatibilidade
-|-- public/                 # Gerado pelo build, ignorado no Git
+|-- public/                 # Assets de deploy atualizados pelo build
 |-- package.json            # Comandos e workspace npm
 |-- package-lock.json
 |-- requirements.txt        # Dependências Python para deploy

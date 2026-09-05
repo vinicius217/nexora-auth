@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Nexora — Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="dashboard-page">
+    <div class="ambient"></div>
+
+    <div class="dashboard-layout premium-dashboard">
+      <aside class="sidebar">
+        <div>
+          <div class="brand sidebar-brand">
+            <div class="logo">N</div>
+            <div class="brand-copy">
+              <b>NEXORA</b>
+              <small>SECURE IDENTITY</small>
+            </div>
+          </div>
+
+          <div class="workspace-chip">
+            <span class="workspace-dot"></span>
+            <div>
+              <strong>Workspace</strong>
+              <small>Personal</small>
+            </div>
+            <span class="workspace-arrow">⌄</span>
+          </div>
+
+          <nav class="nav dashboard-nav">
+            <p class="nav-label">MENU</p>
+            <a class="active" href="#overview">
+              <span class="nav-icon">⌂</span>
+              <span>Visão geral</span>
+            </a>
+            <a href="#perfil">
+              <span class="nav-icon">◎</span>
+              <span>Meu perfil</span>
+            </a>
+            <a href="#seguranca">
+              <span class="nav-icon">◇</span>
+              <span>Segurança</span>
+            </a>
+            <a href="#atividade">
+              <span class="nav-icon">↗</span>
+              <span>Atividade</span>
+            </a>
+          </nav>
+        </div>
+
+        <div class="sidebar-bottom">
+          <div class="sidebar-status">
+            <span class="status-pulse"></span>
+            <div>
+              <strong>Sistema online</strong>
+              <small>Todos os serviços ativos</small>
+            </div>
+          </div>
+          <button class="logout" id="sair">
+            <span class="nav-icon">↪</span>
+            <span>Sair da conta</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main" id="overview">
+        <header class="topbar dashboard-topbar">
+          <div>
+            <div class="eyebrow">PAINEL DO USUÁRIO</div>
+            <h1>
+              Bem-vindo de volta,
+              <span id="saudacaoNome">usuário</span>
+              .
+            </h1>
+            <p>
+              Acompanhe os dados da sua conta e mantenha sua segurança em dia.
+            </p>
+          </div>
+          <div class="topbar-actions">
+            <button
+              class="icon-button"
+              id="refreshDashboard"
+              title="Atualizar dados"
+            >
+              ↻
+            </button>
+            <div id="avatar" class="avatar">N</div>
+          </div>
+        </header>
+
+        <section class="hero-card">
+          <div class="hero-orb hero-orb-one"></div>
+          <div class="hero-orb hero-orb-two"></div>
+          <div class="hero-content">
+            <div>
+              <span class="hero-badge">
+                <span class="status-pulse"></span>
+                CONTA PROTEGIDA
+              </span>
+              <h2>Seu ambiente está seguro e pronto.</h2>
+              <p>
+                Gerencie seu perfil, revise sua segurança e acompanhe os
+                detalhes de acesso em um único lugar.
+              </p>
+            </div>
+            <div class="hero-security-score">
+              <div class="score-ring">
+                <strong id="securityScore">85</strong>
+                <span>%</span>
+              </div>
+              <div>
+                <strong>Nível de segurança</strong>
+                <small id="securityLabel">Muito bom</small>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="stats-grid">
+          <article class="metric-card">
+            <div class="metric-icon">✓</div>
+            <div class="metric-copy">
+              <span>Status da conta</span>
+              <strong id="metricStatus">Ativa</strong>
+              <small id="metricStatusDetail">Funcionando normalmente</small>
+            </div>
+            <span class="metric-trend positive">Online</span>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon">✉</div>
+            <div class="metric-copy">
+              <span>E-mail</span>
+              <strong id="metricEmail">Carregando...</strong>
+              <small>Endereço da conta</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon">⌁</div>
+            <div class="metric-copy">
+              <span>Último acesso</span>
+              <strong id="metricLastLogin">—</strong>
+              <small>Sessão autenticada</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon">◷</div>
+            <div class="metric-copy">
+              <span>Membro desde</span>
+              <strong id="metricMemberSince">—</strong>
+              <small>Conta Nexora</small>
+            </div>
+          </article>
+        </section>
+
+        <section class="dashboard-content-grid">
+          <div class="dashboard-left-column">
+            <article class="panel account-panel" id="perfil">
+              <div class="panel-heading">
+                <div>
+                  <span class="panel-kicker">PERFIL</span>
+                  <h3>Informações da conta</h3>
+                  <p>Seus dados principais e identificação no sistema.</p>
+                </div>
+                <button class="secondary-btn" id="abrirEditar">
+                  Editar perfil
+                </button>
+              </div>
+
+              <div class="profile-summary">
+                <div id="avatar2" class="avatar profile-avatar">N</div>
+                <div class="profile-main-copy">
+                  <h2 id="nome">Carregando...</h2>
+                  <p id="email">...</p>
+                  <div class="profile-tags">
+                    <span class="tag green">● Conta ativa</span>
+                    <span class="tag">E-mail cadastrado</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span>Nome completo</span>
+                  <strong id="detailNome">—</strong>
+                </div>
+                <div class="detail-item">
+                  <span>E-mail</span>
+                  <strong id="detailEmail">—</strong>
+                </div>
+                <div class="detail-item">
+                  <span>Conta criada</span>
+                  <strong id="criado">—</strong>
+                </div>
+                <div class="detail-item">
+                  <span>Último acesso</span>
+                  <strong id="ultimo">—</strong>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel activity-panel" id="atividade">
+              <div class="panel-heading compact-heading">
+                <div>
+                  <span class="panel-kicker">ATIVIDADE</span>
+                  <h3>Atividade recente</h3>
+                  <p>Resumo dos eventos mais importantes da sua conta.</p>
+                </div>
+                <span class="live-indicator">
+                  <span class="status-pulse"></span>
+                  AO VIVO
+                </span>
+              </div>
+
+              <div class="activity-timeline">
+                <div class="activity-row">
+                  <div class="activity-icon success">✓</div>
+                  <div class="activity-copy">
+                    <strong>Login realizado com sucesso</strong>
+                    <span id="activityLastLogin">
+                      Sua sessão atual foi autenticada.
+                    </span>
+                  </div>
+                  <time>Agora</time>
+                </div>
+                <div class="activity-row">
+                  <div class="activity-icon">◇</div>
+                  <div class="activity-copy">
+                    <strong>Proteção JWT ativa</strong>
+                    <span>Seus endpoints privados exigem autenticação.</span>
+                  </div>
+                  <time>Ativo</time>
+                </div>
+                <div class="activity-row">
+                  <div class="activity-icon">◎</div>
+                  <div class="activity-copy">
+                    <strong>Perfil carregado</strong>
+                    <span>As informações da conta estão sincronizadas.</span>
+                  </div>
+                  <time>Agora</time>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="dashboard-right-column">
+            <article class="panel security-panel" id="seguranca">
+              <div class="panel-heading compact-heading">
+                <div>
+                  <span class="panel-kicker">SEGURANÇA</span>
+                  <h3>Proteção da conta</h3>
+                </div>
+              </div>
+              <div class="security-list">
+                <div class="security-item">
+                  <div class="security-icon">✦</div>
+                  <div>
+                    <strong>Senha da conta</strong>
+                    <span>Proteção principal da sua conta</span>
+                  </div>
+                  <span class="security-state success">Configurada</span>
+                </div>
+                <div class="security-item">
+                  <div class="security-icon">⌁</div>
+                  <div>
+                    <strong>Sessão atual</strong>
+                    <span>Token de acesso protegido</span>
+                  </div>
+                  <span class="security-state success">Ativa</span>
+                </div>
+              </div>
+              <button class="btn security-action" id="abrirSenha">
+                Alterar minha senha
+              </button>
+            </article>
+
+            <article class="panel quick-actions-panel">
+              <div class="panel-heading compact-heading">
+                <div>
+                  <span class="panel-kicker">ATALHOS</span>
+                  <h3>Ações rápidas</h3>
+                </div>
+              </div>
+              <div class="quick-actions">
+                <button id="quickEdit">
+                  <span>◎</span>
+                  <div>
+                    <strong>Editar perfil</strong>
+                    <small>Nome e avatar</small>
+                  </div>
+                  <b>›</b>
+                </button>
+                <button id="quickPassword">
+                  <span>◇</span>
+                  <div>
+                    <strong>Alterar senha</strong>
+                    <small>Atualize sua credencial</small>
+                  </div>
+                  <b>›</b>
+                </button>
+                <button id="quickRefresh">
+                  <span>↻</span>
+                  <div>
+                    <strong>Atualizar dados</strong>
+                    <small>Sincronizar dashboard</small>
+                  </div>
+                  <b>›</b>
+                </button>
+              </div>
+            </article>
+
+            <article class="panel session-panel">
+              <div class="session-header">
+                <div>
+                  <span class="panel-kicker">SESSÃO</span>
+                  <h3>Dispositivo atual</h3>
+                </div>
+                <span class="tag green">● Você</span>
+              </div>
+              <div class="device-row" id="currentSession">
+                <div class="device-icon">▣</div>
+                <div>
+                  <strong id="deviceName">Navegador atual</strong>
+                  <span id="deviceInfo">Sessão autenticada via web</span>
+                </div>
+              </div>
+              <div class="session-meta">
+                <span>Última autenticação</span>
+                <strong id="sessionTime">Agora</strong>
+              </div>
+              <div id="otherSessions"></div>
+            </article>
+          </div>
+        </section>
+
+        <footer class="dashboard-footer">
+          <span>Nexora</span>
+          <span>Secure Identity • FastAPI + JWT</span>
+        </footer>
+      </main>
+      <nav class="mobile-dashboard-nav" aria-label="Navegação principal">
+        <a class="active" href="#overview">
+          <span>⌂</span>
+          Início
+        </a>
+        <a href="#perfil">
+          <span>◎</span>
+          Perfil
+        </a>
+        <a href="#seguranca">
+          <span>◇</span>
+          Segurança
+        </a>
+        <a href="#atividade">
+          <span>↗</span>
+          Atividade
+        </a>
+      </nav>
+    </div>
+
+    <div class="modal" id="modal">
+      <div class="panel modal-card">
+        <div class="modal-head">
+          <div>
+            <span class="panel-kicker">PERFIL</span>
+            <h2>Editar perfil</h2>
+            <p class="subtitle">Atualize suas informações públicas.</p>
+          </div>
+          <button class="modal-close" data-close="modal">×</button>
+        </div>
+        <div class="field">
+          <label>Nome</label>
+          <input id="novoNome" placeholder="Seu nome" />
+        </div>
+        <div class="field">
+          <label>URL do avatar</label>
+          <input id="avatarUrl" placeholder="https://..." />
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-btn" data-close="modal">Cancelar</button>
+          <button class="btn" id="salvar">Salvar alterações</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="senhaModal">
+      <div class="panel modal-card">
+        <div class="modal-head">
+          <div>
+            <span class="panel-kicker">SEGURANÇA</span>
+            <h2>Alterar senha</h2>
+            <p class="subtitle">Use uma senha forte e exclusiva.</p>
+          </div>
+          <button class="modal-close" data-close="senhaModal">×</button>
+        </div>
+        <div class="field">
+          <label>Senha atual</label>
+          <div class="input-wrap">
+            <input id="senhaAtual" type="password" />
+            <button
+              type="button"
+              class="toggle-pass"
+              onclick="togglePassword('senhaAtual', this)"
+            >
+              ◉
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Nova senha</label>
+          <div class="input-wrap">
+            <input id="novaSenha" type="password" minlength="8" />
+            <button
+              type="button"
+              class="toggle-pass"
+              onclick="togglePassword('novaSenha', this)"
+            >
+              ◉
+            </button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-btn" data-close="senhaModal">
+            Cancelar
+          </button>
+          <button class="btn" id="trocarSenha">Atualizar senha</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      let usuarioAtual = null;
+
+      function fmt(d) {
+        return d
+          ? new Date(d).toLocaleString("pt-BR", {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })
+          : "Ainda não registrado";
+      }
+      function fmtDate(d) {
+        return d
+          ? new Date(d).toLocaleDateString("pt-BR", {
+              month: "short",
+              year: "numeric",
+            })
+          : "—";
+      }
+      function fmtRelative(d) {
+        if (!d) return "Primeiro acesso";
+        const diff = Date.now() - new Date(d).getTime();
+        const min = Math.max(0, Math.floor(diff / 60000));
+        if (min < 1) return "Agora mesmo";
+        if (min < 60) return `Há ${min} min`;
+        const h = Math.floor(min / 60);
+        if (h < 24) return `Há ${h}h`;
+        return fmt(d);
+      }
+      function iniciais(n) {
+        return (n || "N")
+          .split(" ")
+          .filter(Boolean)
+          .map((x) => x[0])
+          .slice(0, 2)
+          .join("")
+          .toUpperCase();
+      }
+      function setAvatar(el, u) {
+        el.replaceChildren();
+        if (u.avatar_url) {
+          const img = document.createElement("img");
+          img.src = u.avatar_url;
+          img.alt = `Avatar de ${u.nome}`;
+          img.referrerPolicy = "no-referrer";
+          img.addEventListener("error", () => {
+            el.replaceChildren(document.createTextNode(iniciais(u.nome)));
+          });
+          el.appendChild(img);
+        } else {
+          el.textContent = iniciais(u.nome);
+        }
+      }
+      function openModal(id) {
+        $(id).classList.add("open");
+      }
+      function closeModal(id) {
+        $(id).classList.remove("open");
+      }
+      function firstName(nome) {
+        return (nome || "usuário").trim().split(/\s+/)[0];
+      }
+
+      function renderDashboard(u) {
+        usuarioAtual = u;
+        $("saudacaoNome").textContent = firstName(u.nome);
+        $("nome").textContent = u.nome;
+        $("email").textContent = u.email;
+        $("detailNome").textContent = u.nome;
+        $("detailEmail").textContent = u.email;
+        $("criado").textContent = fmt(u.criado_em);
+        $("ultimo").textContent = fmt(u.ultimo_login);
+        $("metricStatus").textContent = u.ativo ? "Ativa" : "Inativa";
+        $("metricStatusDetail").textContent = u.ativo
+          ? "Funcionando normalmente"
+          : "Conta desativada";
+        $("metricEmail").textContent = u.email;
+        $("metricLastLogin").textContent = fmtRelative(u.ultimo_login);
+        $("metricMemberSince").textContent = fmtDate(u.criado_em);
+        $("activityLastLogin").textContent = u.ultimo_login
+          ? `Último acesso registrado ${fmtRelative(u.ultimo_login).toLowerCase()}.`
+          : "Sua sessão atual foi autenticada.";
+        $("sessionTime").textContent = fmtRelative(u.ultimo_login);
+
+        $("securityScore").textContent = "100";
+        $("securityLabel").textContent = "Excelente";
+
+        [$("avatar"), $("avatar2")].forEach((a) => setAvatar(a, u));
+        $("novoNome").value = u.nome;
+        $("avatarUrl").value = u.avatar_url || "";
+
+        const ua = navigator.userAgent;
+        $("deviceName").textContent = /Edg/i.test(ua)
+          ? "Microsoft Edge"
+          : /Chrome/i.test(ua)
+            ? "Google Chrome"
+            : /Firefox/i.test(ua)
+              ? "Mozilla Firefox"
+              : /Safari/i.test(ua)
+                ? "Safari"
+                : "Navegador atual";
+        $("deviceInfo").textContent =
+          `${navigator.platform || "Web"} • Sessão autenticada`;
+      }
+
+      async function init(showFeedback = false) {
+        const btn = $("refreshDashboard");
+        if (btn) btn.classList.add("rotating");
+        const u = await getMe();
+        if (btn) setTimeout(() => btn.classList.remove("rotating"), 350);
+        if (!u) {
+          location.href = "/index.html";
+          return;
+        }
+        renderDashboard(u);
+        await renderSessions();
+        if (showFeedback) mostrarToast("Dashboard atualizado");
+      }
+
+      async function renderSessions() {
+        const sessions = await chamarApi("/auth/sessoes").catch(() => []);
+        const current = sessions.find((session) => session.atual);
+        if (current) {
+          $("sessionTime").textContent = fmtRelative(current.ultima_atividade_em);
+          $("deviceInfo").textContent = `${current.ip_address || "IP protegido"} • Sessão atual`;
+        }
+        const container = $("otherSessions");
+        container.replaceChildren();
+        sessions.filter((session) => !session.atual).forEach((session) => {
+          const row = document.createElement("div");
+          row.className = "device-row";
+          const copy = document.createElement("div");
+          const title = document.createElement("strong");
+          title.textContent = "Outro dispositivo";
+          const detail = document.createElement("span");
+          detail.textContent = `${session.ip_address || "IP protegido"} • ${fmtRelative(session.ultima_atividade_em)}`;
+          copy.append(title, detail);
+          const revoke = document.createElement("button");
+          revoke.className = "secondary-btn";
+          revoke.textContent = "Encerrar";
+          revoke.addEventListener("click", async () => {
+            await chamarApi(`/auth/sessoes/${session.id}`, { method: "DELETE" });
+            mostrarToast("Sessão encerrada");
+            await renderSessions();
+          });
+          row.append(copy, revoke);
+          container.appendChild(row);
+        });
+      }
+
+      $("sair").addEventListener("click", () => logout());
+      $("abrirEditar").addEventListener("click", () => openModal("modal"));
+      $("quickEdit").addEventListener("click", () => openModal("modal"));
+      $("abrirSenha").addEventListener("click", () => openModal("senhaModal"));
+      $("quickPassword").addEventListener("click", () =>
+        openModal("senhaModal"),
+      );
+      $("refreshDashboard").addEventListener("click", () => init(true));
+      $("quickRefresh").addEventListener("click", () => init(true));
+      document
+        .querySelectorAll("[data-close]")
+        .forEach((b) =>
+          b.addEventListener("click", () => closeModal(b.dataset.close)),
+        );
+      document.querySelectorAll(".modal").forEach((m) =>
+        m.addEventListener("click", (e) => {
+          if (e.target === m) closeModal(m.id);
+        }),
+      );
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape")
+          document
+            .querySelectorAll(".modal.open")
+            .forEach((m) => closeModal(m.id));
+      });
+      document.querySelectorAll(".mobile-dashboard-nav a").forEach((a) =>
+        a.addEventListener("click", () => {
+          document
+            .querySelectorAll(".mobile-dashboard-nav a")
+            .forEach((link) => link.classList.remove("active"));
+          a.classList.add("active");
+        }),
+      );
+
+      $("trocarSenha").addEventListener("click", async () => {
+        try {
+          setLoading($("trocarSenha"), true, "Atualizando...");
+          await chamarApi("/auth/alterar-senha", {
+            method: "POST",
+            body: JSON.stringify({
+              senha_atual: $("senhaAtual").value,
+              nova_senha: $("novaSenha").value,
+            }),
+          });
+          mostrarToast("Senha alterada com sucesso");
+          closeModal("senhaModal");
+          $("senhaAtual").value = "";
+          $("novaSenha").value = "";
+        } catch (e) {
+          mostrarToast(e.message, "erro");
+        } finally {
+          setLoading($("trocarSenha"), false);
+        }
+      });
+
+      $("salvar").addEventListener("click", async () => {
+        try {
+          setLoading($("salvar"), true, "Salvando...");
+          const u = await chamarApi("/auth/me", {
+            method: "PATCH",
+            body: JSON.stringify({
+              nome: $("novoNome").value,
+              avatar_url: $("avatarUrl").value || null,
+            }),
+          });
+          mostrarToast("Perfil atualizado");
+          closeModal("modal");
+          renderDashboard(u);
+        } catch (e) {
+          mostrarToast(e.message, "erro");
+        } finally {
+          setLoading($("salvar"), false);
+        }
+      });
+
+      init();
+    </script>
+  </body>
+</html>

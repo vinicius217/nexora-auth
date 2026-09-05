@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#111310" />
+    <title>Nexora — Recuperar senha</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="auth-page">
+    <div class="ambient"></div>
+    <main class="auth-layout">
+      <section class="auth-showcase">
+        <a class="brand auth-brand" href="/">
+          <span class="logo">N</span>
+          <span class="brand-copy">
+            <b>NEXORA</b>
+            <small>SECURE IDENTITY</small>
+          </span>
+        </a>
+        <div class="showcase-copy">
+          <span class="status-pill">
+            <i></i>
+            Recuperação segura
+          </span>
+          <h1>
+            Volte para sua conta
+            <br />
+            <span>com tranquilidade.</span>
+          </h1>
+          <p>Redefina seu acesso sem comprometer a segurança da sua conta.</p>
+          <div class="recovery-visual">
+            <div class="shield">◇</div>
+            <span class="orbit orbit-one"></span>
+            <span class="orbit orbit-two"></span>
+          </div>
+        </div>
+        <footer class="showcase-footer">
+          <span>© 2026 Nexora</span>
+          <span>Privacidade · Segurança</span>
+        </footer>
+      </section>
+      <section class="auth-form-side">
+        <div class="mobile-brand">
+          <span class="logo">N</span>
+          <b>NEXORA</b>
+        </div>
+        <div class="auth-card auth-card-modern">
+          <a class="back-link" href="/index.html">← Voltar para o login</a>
+          <div class="eyebrow">Recuperação de acesso</div>
+          <h2 id="titulo">Esqueceu sua senha?</h2>
+          <p class="subtitle" id="descricao">
+            Informe o e-mail da sua conta. Enviaremos as instruções para criar
+            uma nova senha.
+          </p>
+          <form id="form">
+            <div class="field">
+              <label for="email">E-mail</label>
+              <div class="input-icon-wrap">
+                <span>@</span>
+                <input
+                  id="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="voce@exemplo.com"
+                  required
+                />
+              </div>
+            </div>
+            <button class="btn auth-submit" id="btn">
+              Enviar instruções
+              <span>→</span>
+            </button>
+          </form>
+          <form id="resetForm" hidden>
+            <div class="field">
+              <label for="token">Código de recuperação</label>
+              <div class="input-icon-wrap">
+                <span>#</span>
+                <input
+                  id="token"
+                  autocomplete="one-time-code"
+                  required
+                  minlength="20"
+                />
+              </div>
+            </div>
+            <div class="field">
+              <label for="novaSenha">Nova senha</label>
+              <div class="input-icon-wrap">
+                <span>◇</span>
+                <input
+                  id="novaSenha"
+                  type="password"
+                  autocomplete="new-password"
+                  required
+                  minlength="8"
+                />
+                <button
+                  class="toggle-pass"
+                  type="button"
+                  onclick="togglePassword('novaSenha', this)"
+                  aria-label="Mostrar senha"
+                >
+                  ◉
+                </button>
+              </div>
+            </div>
+            <button class="btn auth-submit" id="resetBtn">
+              Criar nova senha
+              <span>→</span>
+            </button>
+          </form>
+          <div
+            id="mensagem"
+            class="mensagem"
+            role="status"
+            aria-live="polite"
+          ></div>
+          <div class="secure-note">
+            <span>⌾</span>
+            O link de recuperação expira por segurança.
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="/js/api.js"></script>
+    <script>
+      const resetToken = new URLSearchParams(location.search).get("token");
+      if (resetToken) {
+        form.hidden = true;
+        resetForm.hidden = false;
+        token.value = resetToken;
+        titulo.textContent = "Crie uma nova senha";
+        descricao.textContent =
+          "Escolha uma senha forte e exclusiva para sua conta.";
+      }
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setLoading(btn, true, "Enviando...");
+        try {
+          const r = await chamarApi("/auth/esqueci-senha", {
+            method: "POST",
+            body: JSON.stringify({ email: email.value }),
+          });
+          form.hidden = true;
+          resetForm.hidden = false;
+          titulo.textContent = "Crie uma nova senha";
+          descricao.textContent =
+            "Informe o código recebido e escolha sua nova credencial.";
+          if (r.dev_token) token.value = r.dev_token;
+          mostrarMensagem(mensagem, r.message, "sucesso");
+        } catch (err) {
+          mostrarMensagem(mensagem, err.message, "erro");
+        } finally {
+          setLoading(btn, false);
+        }
+      });
+      resetForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setLoading(resetBtn, true, "Atualizando...");
+        try {
+          const r = await chamarApi("/auth/resetar-senha", {
+            method: "POST",
+            body: JSON.stringify({
+              token: token.value,
+              nova_senha: novaSenha.value,
+            }),
+          });
+          mostrarMensagem(mensagem, r.message, "sucesso");
+          setTimeout(() => (location.href = "/index.html"), 1400);
+        } catch (err) {
+          mostrarMensagem(mensagem, err.message, "erro");
+        } finally {
+          setLoading(resetBtn, false);
+        }
+      });
+    </script>
+  </body>
+</html>

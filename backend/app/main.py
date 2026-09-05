@@ -1,8 +1,10 @@
 from contextlib import asynccontextmanager
+import os
 from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi import Request
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
@@ -56,5 +58,11 @@ def health_check():
 
 public_dir = Path(__file__).resolve().parents[2] / "frontend" / "public"
 
-# Serve the frontend locally and in the deployment bundle.
-app.mount("/", StaticFiles(directory=public_dir, html=True), name="public")
+if os.getenv("VERCEL") == "1" or not public_dir.is_dir():
+    # A Vercel publica public/ separadamente pela CDN.
+    @app.get("/", include_in_schema=False)
+    def index():
+        return RedirectResponse("/index.html")
+else:
+    # No desenvolvimento local, o próprio FastAPI entrega o frontend.
+    app.mount("/", StaticFiles(directory=public_dir, html=True), name="public")
