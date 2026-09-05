@@ -3,7 +3,7 @@ from typing import Optional
 import hashlib, secrets
 import bcrypt
 from jose import JWTError, jwt
-from app.core.config import settings
+from backend.app.core.config import settings
 
 def hash_senha(senha: str) -> str:
     return bcrypt.hashpw(senha.encode("utf-8")[:72], bcrypt.gensalt()).decode("utf-8")

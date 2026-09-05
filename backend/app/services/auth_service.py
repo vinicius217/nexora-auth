@@ -1,10 +1,10 @@
 from datetime import datetime, timezone, timedelta
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from app.core.security import hash_senha, verificar_senha, criar_access_token, criar_refresh_token, gerar_token_aleatorio, hash_token
-from app.models.usuario import Usuario
-from app.repositories.usuario_repository import UsuarioRepository
-from app.schemas.usuario import UsuarioCreate, LoginRequest, Token
+from backend.app.core.security import hash_senha, verificar_senha, criar_access_token, criar_refresh_token, gerar_token_aleatorio, hash_token
+from backend.app.models.usuario import Usuario
+from backend.app.repositories.usuario_repository import UsuarioRepository
+from backend.app.schemas.usuario import UsuarioCreate, LoginRequest, Token
 
 class AuthService:
     def __init__(self, db: Session): self.repository = UsuarioRepository(db); self.db = db

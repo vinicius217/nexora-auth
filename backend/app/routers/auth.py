@@ -1,21 +1,21 @@
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
-from app.core.database import get_db
-from app.core.config import settings
-from app.core.dependencies import get_current_user
-from app.core.security import decodificar_token, criar_access_token, criar_refresh_token, hash_senha, verificar_senha, gerar_token_aleatorio, hash_token
-from app.models.usuario import Usuario, Sessao
-from app.schemas.usuario import *
-from app.services.auth_service import AuthService
-from app.services.demo_service import ensure_demo_user, is_demo_user
-from app.services.email_service import EmailConfigurationError, enviar_email_recuperacao, enviar_email_verificacao
+from backend.app.core.database import get_db
+from backend.app.core.config import settings
+from backend.app.core.dependencies import get_current_user
+from backend.app.core.security import decodificar_token, criar_access_token, criar_refresh_token, hash_senha, verificar_senha, gerar_token_aleatorio, hash_token
+from backend.app.models.usuario import Usuario, Sessao
+from backend.app.schemas.usuario import *
+from backend.app.services.auth_service import AuthService
+from backend.app.services.demo_service import ensure_demo_user, is_demo_user
+from backend.app.services.email_service import EmailConfigurationError, enviar_email_recuperacao, enviar_email_verificacao
 from collections import defaultdict
 from typing import Optional
 import smtplib
 import time
 import secrets
-from app.core.rate_limit import limiter
+from backend.app.core.rate_limit import limiter
 
 _login_attempts = defaultdict(list)
 def check_login_rate_limit(request: Request):

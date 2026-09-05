@@ -9,11 +9,13 @@ WORKDIR /app
 RUN addgroup --system nexora && adduser --system --ingroup nexora nexora
 
 COPY requirements.txt .
+COPY backend/requirements.txt ./backend/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
-COPY public ./public
+COPY backend ./backend
+COPY frontend/public ./frontend/public
 RUN chown -R nexora:nexora /app
 
 USER nexora

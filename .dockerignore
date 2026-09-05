@@ -17,3 +17,7 @@ __pycache__
 .vscode
 .idea
 README.md
+
+node_modules
+**/node_modules
+**/__pycache__

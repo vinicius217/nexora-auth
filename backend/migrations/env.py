@@ -2,9 +2,9 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.core.config import settings
-from app.core.database import Base, normalize_database_url
-from app.models import usuario  # noqa: F401
+from backend.app.core.config import settings
+from backend.app.core.database import Base, normalize_database_url
+from backend.app.models import usuario  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", normalize_database_url(settings.DATABASE_URL))

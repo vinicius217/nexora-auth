@@ -4,7 +4,7 @@ from html import escape
 import smtplib
 from urllib.parse import urlencode
 
-from app.core.config import settings
+from backend.app.core.config import settings
 
 
 class EmailConfigurationError(RuntimeError):

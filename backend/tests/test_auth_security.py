@@ -6,10 +6,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.core.database import Base
-from app.schemas.usuario import LoginRequest, ProfileUpdate, UsuarioCreate
-from app.services.auth_service import AuthService
-from app.core.rate_limit import RateLimiter
+from backend.app.core.database import Base
+from backend.app.schemas.usuario import LoginRequest, ProfileUpdate, UsuarioCreate
+from backend.app.services.auth_service import AuthService
+from backend.app.core.rate_limit import RateLimiter
 
 
 class AuthSecurityTests(unittest.TestCase):

@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-from app.core.config import settings
+from backend.app.core.config import settings
 
 
 def normalize_database_url(url: str) -> str:

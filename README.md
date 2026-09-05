@@ -35,47 +35,34 @@ Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e uma i
 
 ```text
 nexora-auth/
-├── app/
-│   ├── core/
-│   │   ├── config.py          # Variáveis de ambiente
-│   │   ├── database.py        # Engine e sessão do banco
-│   │   ├── dependencies.py    # Usuário autenticado
-│   │   └── security.py        # Senhas e tokens JWT
-│   ├── models/usuario.py      # Tabela de usuários
-│   ├── repositories/          # Consultas ao banco
-│   ├── routers/auth.py        # Rotas HTTP
-│   ├── schemas/usuario.py     # Entradas e respostas
-│   ├── services/              # Regras de negócio
-│   └── main.py                # Inicialização do FastAPI
-├── public/
-│   ├── css/style.css          # Design e responsividade
-│   ├── js/api.js              # Cliente HTTP da interface
-│   ├── assets/                # Bundle React gerado pelo Vite
-│   ├── index.html             # Login
-│   ├── cadastro.html          # Cadastro
-│   ├── recuperar.html         # Recuperação de senha
-│   └── dashboard.html         # Área autenticada
-├── src/
-│   ├── components/ui/         # Componentes React reutilizáveis
-│   ├── lib/                   # Utilitários do frontend
-│   ├── styles/                # Tailwind e estilos do componente
-│   └── main.tsx               # Ponto de entrada React
-├── .env.example
-├── .python-version
-├── Dockerfile
-├── package.json
-├── requirements.txt
-├── tsconfig.json
-├── vite.config.ts
-├── vercel.json
-└── README.md
+|-- backend/
+|   |-- app/                # API, modelos, rotas e serviços
+|   |-- migrations/         # Migrações Alembic
+|   |-- tests/              # Testes Python
+|   `-- requirements.txt
+|-- frontend/
+|   |-- public/             # HTML, CSS, JavaScript e assets React
+|   |-- src/                # React e TypeScript
+|   |-- package.json
+|   |-- tsconfig.json
+|   `-- vite.config.ts
+|-- app/main.py             # Entrada de compatibilidade
+|-- public/                 # Gerado pelo build, ignorado no Git
+|-- package.json            # Comandos e workspace npm
+|-- package-lock.json
+|-- requirements.txt        # Referência às dependências do backend
+|-- alembic.ini
+|-- .env.example
+|-- Dockerfile
+|-- vercel.json
+`-- README.md
 ```
 
 ## Como o código funciona
 
 ### Inicialização
 
-`app/main.py` cria as tabelas e registra as rotas. Localmente, o FastAPI monta a pasta `public`; na Vercel, essa pasta é entregue separadamente pela CDN e `/` é direcionado para `index.html`.
+`backend/app/main.py` cria as tabelas e registra as rotas. Localmente, o FastAPI monta a pasta `frontend/public`; na Vercel, essa pasta é entregue separadamente pela CDN e `/` é direcionado para `index.html`.
 
 ```python
 app.include_router(auth.router)
@@ -83,12 +70,12 @@ if os.getenv("VERCEL") == "1":
     # A Vercel entrega public/ pela CDN.
     ...
 else:
-    app.mount("/", StaticFiles(directory="public", html=True), name="public")
+    app.mount("/", StaticFiles(directory=public_dir, html=True), name="public")
 ```
 
 ### Configuração e banco
 
-`app/core/config.py` carrega o `.env` com `pydantic-settings`. `app/core/database.py` cria a conexão SQLAlchemy. O SQLite funciona localmente, enquanto `DATABASE_URL` pode apontar para PostgreSQL em produção.
+`backend/app/core/config.py` carrega o `.env` com `pydantic-settings`. `backend/app/core/database.py` cria a conexão SQLAlchemy. O SQLite funciona localmente, enquanto `DATABASE_URL` pode apontar para PostgreSQL em produção.
 
 ### Cadastro e login
 
@@ -103,11 +90,11 @@ Os tokens são enviados em cookies `HttpOnly`, reduzindo a exposição ao JavaSc
 
 ### Frontend
 
-`public/js/api.js` centraliza as chamadas `fetch`, envia os cookies com `credentials: "include"` e padroniza mensagens, carregamento e logout. Cada HTML mantém apenas a lógica específica da tela.
+`frontend/public/js/api.js` centraliza as chamadas `fetch`, envia os cookies com `credentials: "include"` e padroniza mensagens, carregamento e logout. Cada HTML mantém apenas a lógica específica da tela.
 
-`public/css/style.css` contém o design system, os componentes, o dashboard, os breakpoints responsivos e o suporte a movimento reduzido.
+`frontend/public/css/style.css` contém o design system, os componentes, o dashboard, os breakpoints responsivos e o suporte a movimento reduzido.
 
-O React é usado somente no botão animado de login, montado em `#login-button-root`. O componente fica em `src/components/ui/3d-button.tsx`; Vite e Tailwind geram os arquivos de `public/assets/`, que são servidos pelo mesmo FastAPI.
+O React é usado somente no botão animado de login, montado em `#login-button-root`. O componente fica em `frontend/src/components/ui/3d-button.tsx`; Vite e Tailwind geram os arquivos de `frontend/public/assets/`, que são servidos pelo mesmo FastAPI.
 
 ## Como executar
 
@@ -128,7 +115,7 @@ pip install -r requirements.txt
 npm install
 npm run build
 Copy-Item .env.example .env
-python -m uvicorn app.main:app --reload
+python -m uvicorn backend.app.main:app --reload
 ```
 
 Se o PowerShell bloquear a ativação:
@@ -148,7 +135,7 @@ pip install -r requirements.txt
 npm install
 npm run build
 cp .env.example .env
-python -m uvicorn app.main:app --reload
+python -m uvicorn backend.app.main:app --reload
 ```
 
 Acesse:
@@ -156,6 +143,22 @@ Acesse:
 - Aplicação: `http://localhost:8000`
 - Swagger: `http://localhost:8000/docs`
 - ReDoc: `http://localhost:8000/redoc`
+
+### Comandos na raiz
+
+```bash
+npm run build
+npm run typecheck
+npm run dev:backend
+npm run test:backend
+python -m alembic upgrade head
+```
+
+A aplicação completa é acessada em `http://localhost:8000`. Após editar componentes React, execute `npm run build`. HTML, CSS e JavaScript em `frontend/public/` são servidos diretamente pelo FastAPI local. `npm run dev` inicia o Vite para desenvolvimento do componente.
+
+O `.env` do backend e o banco SQLite continuam na raiz; execute os comandos Python a partir dela. O `.env.local` existente foi preservado na raiz e não é carregado pelo Vite, cuja raiz agora é `frontend/`. Para variáveis públicas do frontend, use `frontend/.env.local` com prefixo `VITE_`, sem segredos.
+
+Antes de construir a imagem Docker, execute `npm ci` e `npm run build` para atualizar os assets React.
 
 ## Variáveis de ambiente
 
@@ -228,13 +231,13 @@ No Gmail, use uma senha de app, não a senha normal da conta. Enquanto `EMAIL_DE
 
 ## Publicar na Vercel
 
-O projeto usa um ponto de entrada FastAPI reconhecido pela Vercel, inclui os arquivos públicos no bundle da função e está preparado para PostgreSQL serverless.
+O arquivo `app/main.py` exporta o FastAPI de `backend/app/main.py`. O build copia `frontend/public/` para `public/`, servido pela CDN, conforme a [documentação FastAPI da Vercel](https://vercel.com/docs/frameworks/backend/fastapi).
 
 ### 1. Importar o projeto
 
 1. Acesse `https://vercel.com/new` e conecte sua conta do GitHub.
 2. Importe o repositório `vinicius217/nexora-auth`.
-3. Mantenha o diretório raiz. Os assets React já são gerados em `public/assets/`; para alterações no componente, execute `npm run build` antes do deploy.
+3. Mantenha o diretório raiz. O `vercel.json` define `npm run build` para gerar os assets e preparar a pasta pública em cada deploy.
 
 ### 2. Criar o banco Neon
 

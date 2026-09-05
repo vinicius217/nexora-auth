@@ -1,8 +1,8 @@
 from typing import Optional
 from sqlalchemy.orm import Session
 
-from app.models.usuario import Usuario
-from app.schemas.usuario import UsuarioCreate
+from backend.app.models.usuario import Usuario
+from backend.app.schemas.usuario import UsuarioCreate
 
 
 class UsuarioRepository:

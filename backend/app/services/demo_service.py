@@ -3,9 +3,9 @@ import secrets
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
-from app.core.security import hash_senha
-from app.models.usuario import Usuario
+from backend.app.core.config import settings
+from backend.app.core.security import hash_senha
+from backend.app.models.usuario import Usuario
 
 
 def ensure_demo_user(db: Session) -> Usuario | None:
