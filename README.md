@@ -50,7 +50,7 @@ nexora-auth/
 |-- public/                 # Gerado pelo build, ignorado no Git
 |-- package.json            # Comandos e workspace npm
 |-- package-lock.json
-|-- requirements.txt        # Referência às dependências do backend
+|-- requirements.txt        # Dependências Python para deploy
 |-- alembic.ini
 |-- .env.example
 |-- Dockerfile
