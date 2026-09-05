@@ -33,5 +33,5 @@
       "destination": "/index.html"
     }
   ],
-  "buildCommand": "npm run build"
+  "buildCommand": "npm ci --include=dev && npm run build"
 }
