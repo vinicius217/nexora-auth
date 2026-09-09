@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from backend.app.core.config import settings
 
@@ -16,11 +16,15 @@ def normalize_database_url(url: str) -> str:
 database_url = normalize_database_url(settings.DATABASE_URL)
 is_sqlite = database_url.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
-pool_options = {} if is_sqlite else {
-    "pool_size": 1,
-    "max_overflow": 2,
-    "pool_recycle": 300,
-}
+pool_options = (
+    {}
+    if is_sqlite
+    else {
+        "pool_size": 1,
+        "max_overflow": 2,
+        "pool_recycle": 300,
+    }
+)
 engine = create_engine(
     database_url,
     connect_args=connect_args,

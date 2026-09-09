@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.sql import func
+
 from backend.app.core.database import Base
+
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -23,11 +25,20 @@ class Sessao(Base):
     __tablename__ = "sessoes"
 
     id = Column(Integer, primary_key=True)
-    usuario_id = Column(Integer, ForeignKey("usuarios.id", ondelete="CASCADE"), index=True, nullable=False)
+    usuario_id = Column(
+        Integer,
+        ForeignKey("usuarios.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
     refresh_jti_hash = Column(String(64), unique=True, index=True, nullable=False)
     user_agent = Column(String(300), nullable=True)
     ip_address = Column(String(64), nullable=True)
-    criada_em = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    ultima_atividade_em = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    criada_em = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    ultima_atividade_em = Column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
     expira_em = Column(DateTime(timezone=True), nullable=False)
     revogada_em = Column(DateTime(timezone=True), nullable=True)

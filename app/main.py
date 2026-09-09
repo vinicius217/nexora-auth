@@ -1,2 +1,3 @@
 """Compatibility entrypoint for Uvicorn and Vercel."""
-from backend.app.main import app
+
+from backend.app.main import app as app

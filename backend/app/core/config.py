@@ -36,7 +36,9 @@ class Settings(BaseSettings):
     def validate_production_settings(self):
         if self.ENVIRONMENT.lower() == "production":
             if self.SECRET_KEY == "troque-essa-chave-no-.env-antes-de-ir-pra-producao":
-                raise ValueError("Defina uma SECRET_KEY exclusiva antes de iniciar em produção.")
+                raise ValueError(
+                    "Defina uma SECRET_KEY exclusiva antes de iniciar em produção."
+                )
             if not self.SECURE_COOKIES:
                 raise ValueError("SECURE_COOKIES deve ser true em produção.")
         return self

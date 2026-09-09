@@ -1,15 +1,15 @@
 import unittest
-from fastapi import HTTPException
 
+from fastapi import HTTPException
 from pydantic import ValidationError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from backend.app.core.database import Base
+from backend.app.core.rate_limit import RateLimiter
 from backend.app.schemas.usuario import LoginRequest, ProfileUpdate, UsuarioCreate
 from backend.app.services.auth_service import AuthService
-from backend.app.core.rate_limit import RateLimiter
 
 
 class AuthSecurityTests(unittest.TestCase):
@@ -44,14 +44,23 @@ class AuthSecurityTests(unittest.TestCase):
 
     def test_registration_rejects_repeated_password_pattern(self):
         with self.assertRaises(HTTPException) as contexto:
-            self.service.registrar(UsuarioCreate(nome="Pessoa Teste", email="fraca@example.com", senha="aaaaaaaa", confirmar_senha="aaaaaaaa"))
+            self.service.registrar(
+                UsuarioCreate(
+                    nome="Pessoa Teste",
+                    email="fraca@example.com",
+                    senha="aaaaaaaa",
+                    confirmar_senha="aaaaaaaa",
+                )
+            )
         self.assertEqual(contexto.exception.status_code, 400)
 
     def test_avatar_accepts_only_http_urls(self):
         with self.assertRaises(ValidationError):
             ProfileUpdate(nome="Pessoa Teste", avatar_url="javascript:alert(1)")
 
-        perfil = ProfileUpdate(nome="Pessoa Teste", avatar_url="https://example.com/avatar.png")
+        perfil = ProfileUpdate(
+            nome="Pessoa Teste", avatar_url="https://example.com/avatar.png"
+        )
         self.assertEqual(perfil.avatar_url.scheme, "https")
 
     def test_rate_limiter_rejects_after_limit(self):

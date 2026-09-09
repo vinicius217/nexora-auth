@@ -46,4 +46,6 @@ def ensure_demo_user(db: Session) -> Usuario | None:
 
 
 def is_demo_user(usuario: Usuario) -> bool:
-    return settings.DEMO_MODE and usuario.email.lower() == settings.DEMO_USER_EMAIL.lower()
+    return (
+        settings.DEMO_MODE and usuario.email.lower() == settings.DEMO_USER_EMAIL.lower()
+    )

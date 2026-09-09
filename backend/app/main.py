@@ -1,9 +1,8 @@
-from contextlib import asynccontextmanager
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
-from fastapi import Request
+from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
@@ -19,6 +18,7 @@ async def lifespan(_: FastAPI):
     with SessionLocal() as db:
         ensure_demo_user(db)
     yield
+
 
 app = FastAPI(
     title="Sistema de Login",

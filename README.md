@@ -6,7 +6,7 @@ Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e uma i
 
 ## Funcionalidades
 
-- Cadastro direto com indicador de força da senha.
+- Cadastro com confirmação de e-mail e indicador de força da senha.
 - Login com limite básico de tentativas.
 - Access token e refresh token armazenados em cookies `HttpOnly`.
 - Renovação automática da sessão e logout seguro.
@@ -22,14 +22,14 @@ Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e uma i
 
 ## Tecnologias
 
-| Camada | Tecnologias |
-| --- | --- |
-| Backend | Python, FastAPI e Uvicorn |
-| Banco de dados | SQLite, PostgreSQL e SQLAlchemy |
-| Validação | Pydantic |
-| Segurança | JWT, bcrypt e cookies HttpOnly |
-| Frontend | HTML5, CSS3, JavaScript, React, TypeScript e Tailwind CSS |
-| Build frontend | Vite |
+| Camada         | Tecnologias                                               |
+| -------------- | --------------------------------------------------------- |
+| Backend        | Python, FastAPI e Uvicorn                                 |
+| Banco de dados | SQLite, PostgreSQL e SQLAlchemy                           |
+| Validação      | Pydantic                                                  |
+| Segurança      | JWT, bcrypt e cookies HttpOnly                            |
+| Frontend       | HTML5, CSS3, JavaScript, React, TypeScript e Tailwind CSS |
+| Build frontend | Vite                                                      |
 
 ## Estrutura do projeto
 
@@ -58,20 +58,13 @@ nexora-auth/
 `-- README.md
 ```
 
+Edite os arquivos em `frontend/src/` e `frontend/public/`. O build gera os assets React e copia os arquivos públicos para `public/`; evite editar essas cópias manualmente. Os arquivos `__init__.py` identificam os pacotes Python, mesmo quando estão vazios.
+
 ## Como o código funciona
 
 ### Inicialização
 
 `backend/app/main.py` cria as tabelas e registra as rotas. Localmente, o FastAPI monta a pasta `frontend/public`; na Vercel, essa pasta é entregue separadamente pela CDN e `/` é direcionado para `index.html`.
-
-```python
-app.include_router(auth.router)
-if os.getenv("VERCEL") == "1":
-    # A Vercel entrega public/ pela CDN.
-    ...
-else:
-    app.mount("/", StaticFiles(directory=public_dir, html=True), name="public")
-```
 
 ### Configuração e banco
 
@@ -178,25 +171,25 @@ DEMO_USER_EMAIL=demo@nexora.dev
 DEMO_USER_NAME=Nexora Demo
 ```
 
-| Variável | Finalidade |
-| --- | --- |
-| `APP_NAME` | Nome da aplicação |
-| `ENVIRONMENT` | Ambiente atual (`development` ou `production`) |
-| `DATABASE_URL` | Endereço do banco usado localmente ou em outros provedores |
-| `NEON_DATABASE_URL` | Endereço com pooler criado pela integração Neon e usado com prioridade |
-| `NEON_URL` | Nome alternativo aceito para uma conexão Neon |
-| `SECRET_KEY` | Assinatura dos tokens |
-| `ALGORITHM` | Algoritmo JWT |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Duração do acesso |
-| `REFRESH_TOKEN_EXPIRE_DAYS` | Duração da renovação |
-| `SECURE_COOKIES` | Restringe cookies a HTTPS |
-| `DEMO_MODE` | Ativa o acesso de demonstração sem cadastro |
-| `DEMO_USER_EMAIL` | E-mail interno da conta demonstrativa |
-| `DEMO_USER_NAME` | Nome exibido na conta demonstrativa |
+| Variável                      | Finalidade                                                             |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| `APP_NAME`                    | Nome da aplicação                                                      |
+| `ENVIRONMENT`                 | Ambiente atual (`development` ou `production`)                         |
+| `DATABASE_URL`                | Endereço do banco usado localmente ou em outros provedores             |
+| `NEON_DATABASE_URL`           | Endereço com pooler criado pela integração Neon e usado com prioridade |
+| `NEON_URL`                    | Nome alternativo aceito para uma conexão Neon                          |
+| `SECRET_KEY`                  | Assinatura dos tokens                                                  |
+| `ALGORITHM`                   | Algoritmo JWT                                                          |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Duração do acesso                                                      |
+| `REFRESH_TOKEN_EXPIRE_DAYS`   | Duração da renovação                                                   |
+| `SECURE_COOKIES`              | Restringe cookies a HTTPS                                              |
+| `DEMO_MODE`                   | Ativa o acesso de demonstração sem cadastro                            |
+| `DEMO_USER_EMAIL`             | E-mail interno da conta demonstrativa                                  |
+| `DEMO_USER_NAME`              | Nome exibido na conta demonstrativa                                    |
 
 ### Envio de recuperação de senha
 
-O cadastro e o login não exigem confirmação de e-mail. Para enviar links reais de recuperação de senha, configure no `.env`:
+O login exige confirmação de e-mail. Para enviar links de verificação e recuperação de senha, configure no `.env`:
 
 ```env
 APP_URL=http://localhost:8000
@@ -214,20 +207,20 @@ No Gmail, use uma senha de app, não a senha normal da conta. Enquanto `EMAIL_DE
 
 ## Endpoints principais
 
-| Método | Rota | Descrição |
-| --- | --- | --- |
-| `POST` | `/auth/registrar` | Cria uma conta |
-| `POST` | `/auth/login` | Autentica e cria a sessão |
-| `GET` | `/auth/demo` | Informa se o modo demonstrativo está ativo |
-| `POST` | `/auth/demo` | Inicia uma sessão demonstrativa |
-| `POST` | `/auth/refresh` | Renova o access token |
-| `POST` | `/auth/logout` | Encerra a sessão |
-| `GET` | `/auth/me` | Retorna o usuário atual |
-| `PATCH` | `/auth/me` | Atualiza nome e avatar |
-| `POST` | `/auth/alterar-senha` | Altera a senha autenticada |
-| `POST` | `/auth/esqueci-senha` | Cria um token de recuperação |
-| `POST` | `/auth/resetar-senha` | Redefine a senha pelo token |
-| `GET` | `/health` | Verifica a disponibilidade do serviço |
+| Método  | Rota                  | Descrição                                  |
+| ------- | --------------------- | ------------------------------------------ |
+| `POST`  | `/auth/registrar`     | Cria uma conta                             |
+| `POST`  | `/auth/login`         | Autentica e cria a sessão                  |
+| `GET`   | `/auth/demo`          | Informa se o modo demonstrativo está ativo |
+| `POST`  | `/auth/demo`          | Inicia uma sessão demonstrativa            |
+| `POST`  | `/auth/refresh`       | Renova o access token                      |
+| `POST`  | `/auth/logout`        | Encerra a sessão                           |
+| `GET`   | `/auth/me`            | Retorna o usuário atual                    |
+| `PATCH` | `/auth/me`            | Atualiza nome e avatar                     |
+| `POST`  | `/auth/alterar-senha` | Altera a senha autenticada                 |
+| `POST`  | `/auth/esqueci-senha` | Cria um token de recuperação               |
+| `POST`  | `/auth/resetar-senha` | Redefine a senha pelo token                |
+| `GET`   | `/health`             | Verifica a disponibilidade do serviço      |
 
 ## Publicar na Vercel
 
@@ -272,16 +265,6 @@ python -c "import secrets; print(secrets.token_urlsafe(64))"
 
 Depois de salvar as variáveis, faça um novo deploy. A URL terminará em `.vercel.app` e o botão **Acessar demonstração** será exibido automaticamente.
 
-### 4. Atualizar o portfólio
-
-Use a URL pública no botão principal do projeto e mantenha o GitHub como ação secundária:
-
-```html
-<a href="https://SEU-PROJETO.vercel.app" target="_blank" rel="noopener noreferrer">
-  Abrir demonstração →
-</a>
-```
-
 ## Hospedagem alternativa com Docker
 
 O `Dockerfile` continua disponível para serviços compatíveis com contêineres, como Koyeb, Render ou uma infraestrutura própria.
@@ -295,7 +278,7 @@ Antes de publicar em produção:
 3. Ative `SECURE_COOKIES=true` sob HTTPS.
 4. Envie tokens de recuperação por e-mail; não os devolva na API em produção.
 5. Troque o rate limit em memória por Redis ou middleware dedicado.
-6. Restrinja CORS, use migrações com Alembic e adicione testes automatizados.
+6. Use as migrações Alembic e execute os testes automatizados antes de publicar alterações.
 
 ## Licença
 

@@ -8034,13 +8034,7 @@ var e = (e, t) => () => (t || (e((t = { exports: {} }).exports, t), e = null), t
 		}
 	}
 	n(), t.exports = s();
-})), l = n(), u = c();
-function d(...e) {
-	return e.filter(Boolean).join(" ");
-}
-//#endregion
-//#region ../node_modules/react/cjs/react-jsx-runtime.production.js
-var f = /* @__PURE__ */ e(((e) => {
+})), l = /* @__PURE__ */ e(((e) => {
 	var t = Symbol.for("react.transitional.element");
 	function n(e, n, r) {
 		var i = null;
@@ -8055,14 +8049,14 @@ var f = /* @__PURE__ */ e(((e) => {
 		};
 	}
 	e.jsx = n, e.jsxs = n;
-})), p = (/* @__PURE__ */ e(((e, t) => {
-	t.exports = f();
-})))(), m = (e) => ({ "--i": e }), h = (e) => [...e].map((e, t) => /* @__PURE__ */ (0, p.jsx)("span", {
+})), u = /* @__PURE__ */ e(((e, t) => {
+	t.exports = l();
+})), d = n(), f = c(), p = u(), m = (e) => ({ "--i": e }), h = (e) => [...e].map((e, t) => /* @__PURE__ */ (0, p.jsx)("span", {
 	"data-label": e,
 	style: m(t + 1),
 	children: e
 }, `${e}-${t}`)), g = ({ idleLabel: e = "Entrar", loadingLabel: t = "Entrando" }) => /* @__PURE__ */ (0, p.jsx)("div", {
-	className: d("flex items-center justify-center py-4"),
+	className: "flex items-center justify-center py-4",
 	children: /* @__PURE__ */ (0, p.jsxs)("button", {
 		id: "btn-login",
 		type: "submit",
@@ -8187,5 +8181,5 @@ var f = /* @__PURE__ */ e(((e) => {
 		]
 	})
 }), _ = document.getElementById("login-button-root");
-_ && (0, u.createRoot)(_).render(/* @__PURE__ */ (0, p.jsx)(l.StrictMode, { children: /* @__PURE__ */ (0, p.jsx)(g, {}) }));
+_ && (0, f.createRoot)(_).render(/* @__PURE__ */ (0, p.jsx)(d.StrictMode, { children: /* @__PURE__ */ (0, p.jsx)(g, {}) }));
 //#endregion

@@ -1,4 +1,5 @@
 from typing import Optional
+
 from sqlalchemy.orm import Session
 
 from backend.app.models.usuario import Usuario
@@ -6,7 +7,6 @@ from backend.app.schemas.usuario import UsuarioCreate
 
 
 class UsuarioRepository:
-
     def __init__(self, db: Session):
         self.db = db
 

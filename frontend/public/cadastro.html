@@ -202,8 +202,12 @@
               }),
             });
             sessionStorage.setItem("pendingVerificationEmail", email.value);
-            const q = new URLSearchParams({ email: email.value, enviado: String(r.email_enviado) });
-            if (r.dev_verification_token) q.set("token", r.dev_verification_token);
+            const q = new URLSearchParams({
+              email: email.value,
+              enviado: String(r.email_enviado),
+            });
+            if (r.dev_verification_token)
+              q.set("token", r.dev_verification_token);
             location.href = "/verificar.html?" + q;
           } catch (err) {
             mostrarMensagem(mensagem, err.message, "erro");
