@@ -15,7 +15,7 @@ Sistema full-stack de autenticação criado com FastAPI, SQLAlchemy, JWT e uma i
 - Dashboard responsivo com navegação mobile.
 - Botão de login animado construído como componente React + TypeScript.
 - Tailwind CSS isolado ao componente React para não interferir nas páginas existentes.
-- Identidade visual em grafite, marfim e verde-musgo, com símbolo próprio da Nexora.
+- Identidade visual em preto, grafite e cinza, com textos claros, com símbolo próprio da Nexora.
 - Modo de demonstração somente leitura para recrutadores.
 - Health check para monitoramento da aplicação.
 - Documentação interativa da API com Swagger.

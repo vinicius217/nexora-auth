@@ -1,0 +1,36 @@
+/* Base grafite com acentos discretos em azul acinzentado. */
+:root {
+  color-scheme: dark;
+  --bg: #101114;
+  --card: #191b20;
+  --border: #30343d;
+  --text: #f0f2f6;
+  --muted: #a0a7b4;
+  --primary: #a8bad8;
+  --primary2: #7086a8;
+  --success: #8cc7ad;
+  --danger: #ee9a9f;
+}
+body, .premium-dashboard, .premium-dashboard .main { background: var(--bg); }
+.auth-showcase, .premium-dashboard .sidebar { background: #15171c; border-color: var(--border); }
+.auth-card, .premium-dashboard .panel, .metric-card, .modal-card { background: var(--card); border-color: var(--border); }
+a, .eyebrow, .panel-kicker, .back-link, .message-action { color: #afc2e2; }
+a:hover { color: #d5e2f7; }
+.logo, .logo:after, .premium-dashboard .avatar { background: #acbdd8; color: #141a25; }
+.logo:before { background: #141a25; }
+.btn, .auth-submit { background: #303d54; color: #f4f7fc; border: 1px solid #596d8d; }
+.btn:hover, .auth-submit:hover { background: #3c4d68; color: #fff; }
+input { background: #13151a; border-color: #373c46; color: var(--text); }
+input:focus { border-color: #91a9d0; box-shadow: 0 0 0 3px rgb(145 169 208 / 12%); }
+:focus-visible { outline-color: #acc3e8 !important; }
+.dashboard-nav a.active, .mobile-dashboard-nav a.active { background: #252e3e; color: #d7e4f9; box-shadow: inset 2px 0 #9fb5d9; }
+.hero-card { background: radial-gradient(ellipse at top right, #29354a, transparent 65%), #191e27; border-color: #3a4559; }
+.hero-badge, .session-emblem, .metric-icon, .security-icon, .activity-icon, .device-icon, .quick-actions button > span, .recovery-mail { background: #242d3b; border-color: #40516a; color: #b7cbee; }
+.hero-content > div:first-child > p { color: #bbc4d3; }
+.dashboard-topbar h1 span, .showcase-copy h1 span { color: #b9c9e3; }
+.profile-summary, .workspace-chip, .recovery-sent { background: #1d2129; border-color: #343d4c; }
+.mobile-dashboard-nav { background: #171a20; border-color: #394355; }
+.status-pulse, .workspace-dot { background: #8cc7ad; }
+.tag.green, .security-state.success, .mensagem.sucesso { color: #a1d8be; background: #1c3029; border-color: #35594a; }
+.mensagem.erro, .toast.erro { color: #ffb8bd; background: #352125; border-color: #71434b; }
+.hero-security-score small { color: #a1d8be; }

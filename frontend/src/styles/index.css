@@ -9,12 +9,12 @@
   contain: layout style;
 }
 .button {
-  --white: #f3f6e7;
-  --purple-100: #dce7b9;
-  --purple-200: #c5d794;
-  --purple-300: #aabe78;
-  --purple-400: #7f9564;
-  --purple-500: #4d5b3c;
+  --white: #f4f4f4;
+  --purple-100: #a5b4cc;
+  --purple-200: #61728f;
+  --purple-300: #344158;
+  --purple-400: #222c3e;
+  --purple-500: #101621;
   --radius: 18px;
   border-radius: var(--radius);
   outline: none;
@@ -47,10 +47,10 @@
   filter: blur(4px);
   transition: 0.3s;
   box-shadow:
-    -6px 6px 0 rgb(77 91 60/0.32),
-    -12px 12px 2px rgb(77 91 60/0.2),
-    -18px 18px 8px rgb(77 91 60/0.12),
-    -25px 24px 16px rgb(77 91 60/0.06);
+    -6px 6px 0 rgb(30 38 55/0.32),
+    -12px 12px 2px rgb(30 38 55/0.2),
+    -18px 18px 8px rgb(30 38 55/0.12),
+    -25px 24px 16px rgb(30 38 55/0.06);
 }
 .button .wrap {
   border-radius: inherit;
@@ -77,7 +77,7 @@
   width: 120px;
   height: 300px;
   margin: auto;
-  background: linear-gradient(to right, transparent, #fff, transparent);
+  background: linear-gradient(to right, transparent, #ffffff, transparent);
   animation: spin 3s linear infinite paused;
 }
 .button .content {
@@ -250,7 +250,7 @@
   animation: charAppear 1s ease backwards calc(var(--i) * 0.03s);
 }
 .button:focus-visible {
-  outline: 3px solid #dce7b9;
+  outline: 3px solid #e1e1e1;
   outline-offset: 7px;
 }
 .button:disabled {
@@ -339,11 +339,11 @@
 }
 @keyframes path {
   from {
-    stroke: #fff;
+    stroke: #ffffff;
   }
   to {
     stroke-dashoffset: -480;
-    stroke: #dce7b9;
+    stroke: #e1e1e1;
   }
 }
 @keyframes splash {

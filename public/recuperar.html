@@ -3,11 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#111310" />
+    <meta name="theme-color" content="#121212" />
+    <meta name="referrer" content="no-referrer" />
     <title>Nexora — Recuperar senha</title>
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/style.css?v=dark-3" />
+    <link rel="stylesheet" href="/css/recovery.css?v=dark-3" />
+    <link rel="stylesheet" href="/css/theme.css?v=dark-3" />
   </head>
-  <body class="auth-page">
+  <body class="auth-page recovery-page">
     <div class="ambient"></div>
     <main class="auth-layout">
       <section class="auth-showcase">
@@ -72,19 +75,18 @@
               <span>→</span>
             </button>
           </form>
+          <section id="sentState" class="recovery-sent" hidden aria-label="Próximos passos">
+            <div class="recovery-mail" aria-hidden="true">✉</div>
+            <p>Se houver uma conta com esse endereço, você receberá um link para redefinir sua senha.</p>
+            <ol>
+              <li>Abra sua caixa de entrada e procure por Nexora.</li>
+              <li>Confira também a pasta de spam.</li>
+              <li>Use o link em até 30 minutos.</li>
+            </ol>
+            <button type="button" class="secondary-btn" id="requestAgain">Tentar novamente ou alterar e-mail</button>
+            <a id="devLink" class="back-link" hidden>Continuar em modo de desenvolvimento →</a>
+          </section>
           <form id="resetForm" hidden>
-            <div class="field">
-              <label for="token">Código de recuperação</label>
-              <div class="input-icon-wrap">
-                <span>#</span>
-                <input
-                  id="token"
-                  autocomplete="one-time-code"
-                  required
-                  minlength="20"
-                />
-              </div>
-            </div>
             <div class="field">
               <label for="novaSenha">Nova senha</label>
               <div class="input-icon-wrap">
@@ -95,6 +97,8 @@
                   autocomplete="new-password"
                   required
                   minlength="8"
+                  maxlength="72"
+                  aria-describedby="passwordHint"
                 />
                 <button
                   class="toggle-pass"
@@ -105,11 +109,21 @@
                   ◉
                 </button>
               </div>
+              <small id="passwordHint">Use entre 8 e 72 caracteres e evite senhas reutilizadas.</small>
+            </div>
+            <div class="field">
+              <label for="confirmarSenha">Confirme a nova senha</label>
+              <div class="input-icon-wrap">
+                <span>◇</span>
+                <input id="confirmarSenha" type="password" autocomplete="new-password" minlength="8" maxlength="72" required placeholder="Digite a senha novamente" />
+                <button class="toggle-pass" type="button" onclick="togglePassword('confirmarSenha', this)" aria-label="Mostrar senha">◉</button>
+              </div>
             </div>
             <button class="btn auth-submit" id="resetBtn">
               Criar nova senha
               <span>→</span>
             </button>
+            <a class="back-link" href="/recuperar.html">Solicitar outro link de recuperação</a>
           </form>
           <div
             id="mensagem"
@@ -125,56 +139,6 @@
       </section>
     </main>
     <script src="/js/api.js"></script>
-    <script>
-      const resetToken = new URLSearchParams(location.search).get("token");
-      if (resetToken) {
-        form.hidden = true;
-        resetForm.hidden = false;
-        token.value = resetToken;
-        titulo.textContent = "Crie uma nova senha";
-        descricao.textContent =
-          "Escolha uma senha forte e exclusiva para sua conta.";
-      }
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        setLoading(btn, true, "Enviando...");
-        try {
-          const r = await chamarApi("/auth/esqueci-senha", {
-            method: "POST",
-            body: JSON.stringify({ email: email.value }),
-          });
-          form.hidden = true;
-          resetForm.hidden = false;
-          titulo.textContent = "Crie uma nova senha";
-          descricao.textContent =
-            "Informe o código recebido e escolha sua nova credencial.";
-          if (r.dev_token) token.value = r.dev_token;
-          mostrarMensagem(mensagem, r.message, "sucesso");
-        } catch (err) {
-          mostrarMensagem(mensagem, err.message, "erro");
-        } finally {
-          setLoading(btn, false);
-        }
-      });
-      resetForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        setLoading(resetBtn, true, "Atualizando...");
-        try {
-          const r = await chamarApi("/auth/resetar-senha", {
-            method: "POST",
-            body: JSON.stringify({
-              token: token.value,
-              nova_senha: novaSenha.value,
-            }),
-          });
-          mostrarMensagem(mensagem, r.message, "sucesso");
-          setTimeout(() => (location.href = "/index.html"), 1400);
-        } catch (err) {
-          mostrarMensagem(mensagem, err.message, "erro");
-        } finally {
-          setLoading(resetBtn, false);
-        }
-      });
-    </script>
+    <script src="/js/recovery.js"></script>
   </body>
 </html>

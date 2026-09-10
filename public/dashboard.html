@@ -4,7 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Nexora — Dashboard</title>
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/style.css?v=dark-3" />
+    <link rel="stylesheet" href="/css/dashboard.css?v=dark-3" />
+    <link rel="stylesheet" href="/css/theme.css?v=dark-3" />
   </head>
   <body class="dashboard-page">
     <div class="ambient"></div>
@@ -23,10 +25,9 @@
           <div class="workspace-chip">
             <span class="workspace-dot"></span>
             <div>
-              <strong>Workspace</strong>
-              <small>Personal</small>
+              <strong>Minha conta</strong>
+              <small>Espaço pessoal</small>
             </div>
-            <span class="workspace-arrow">⌄</span>
           </div>
 
           <nav class="nav dashboard-nav">
@@ -54,8 +55,8 @@
           <div class="sidebar-status">
             <span class="status-pulse"></span>
             <div>
-              <strong>Sistema online</strong>
-              <small>Todos os serviços ativos</small>
+              <strong>Seu espaço Nexora</strong>
+              <small>Perfil, acesso e segurança</small>
             </div>
           </div>
           <button class="logout" id="sair">
@@ -71,8 +72,7 @@
             <div class="eyebrow">PAINEL DO USUÁRIO</div>
             <h1>
               Bem-vindo de volta,
-              <span id="saudacaoNome">usuário</span>
-              .
+              <span id="saudacaoNome">usuário</span>.
             </h1>
             <p>
               Acompanhe os dados da sua conta e mantenha sua segurança em dia.
@@ -97,22 +97,19 @@
             <div>
               <span class="hero-badge">
                 <span class="status-pulse"></span>
-                CONTA PROTEGIDA
+                SUA CONTA, EM UM SÓ LUGAR
               </span>
-              <h2>Seu ambiente está seguro e pronto.</h2>
+              <h2>Mais controle. Mais tranquilidade.</h2>
               <p>
                 Gerencie seu perfil, revise sua segurança e acompanhe os
                 detalhes de acesso em um único lugar.
               </p>
             </div>
             <div class="hero-security-score">
-              <div class="score-ring">
-                <strong id="securityScore">85</strong>
-                <span>%</span>
-              </div>
+              <div class="session-emblem" aria-hidden="true">✓</div>
               <div>
-                <strong>Nível de segurança</strong>
-                <small id="securityLabel">Muito bom</small>
+                <strong>Acesso à conta</strong>
+                <small id="securityLabel">Carregando sessão...</small>
               </div>
             </div>
           </div>
@@ -209,7 +206,7 @@
                 </div>
                 <span class="live-indicator">
                   <span class="status-pulse"></span>
-                  AO VIVO
+                  RESUMO
                 </span>
               </div>
 
@@ -227,8 +224,8 @@
                 <div class="activity-row">
                   <div class="activity-icon">◇</div>
                   <div class="activity-copy">
-                    <strong>Proteção JWT ativa</strong>
-                    <span>Seus endpoints privados exigem autenticação.</span>
+                    <strong>Acesso autenticado</strong>
+                    <span>Somente você pode acessar os dados da sua conta.</span>
                   </div>
                   <time>Ativo</time>
                 </div>
@@ -336,7 +333,7 @@
 
         <footer class="dashboard-footer">
           <span>Nexora</span>
-          <span>Secure Identity • FastAPI + JWT</span>
+          <span>Sua identidade. Seu controle.</span>
         </footer>
       </main>
       <nav class="mobile-dashboard-nav" aria-label="Navegação principal">
@@ -520,8 +517,7 @@
           : "Sua sessão atual foi autenticada.";
         $("sessionTime").textContent = fmtRelative(u.ultimo_login);
 
-        $("securityScore").textContent = "100";
-        $("securityLabel").textContent = "Excelente";
+        $("securityLabel").textContent = "Sessão autenticada";
 
         [$("avatar"), $("avatar2")].forEach((a) => setAvatar(a, u));
         $("novoNome").value = u.nome;
@@ -661,6 +657,17 @@
           a.classList.add("active");
         }),
       );
+      function atualizarNavegacao() {
+        const destino = location.hash || "#overview";
+        document.querySelectorAll(".dashboard-nav a, .mobile-dashboard-nav a").forEach((link) => {
+          const ativo = link.getAttribute("href") === destino;
+          link.classList.toggle("active", ativo);
+          if (ativo) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      }
+      window.addEventListener("hashchange", atualizarNavegacao);
+      atualizarNavegacao();
 
       $("trocarSenha").addEventListener("click", async () => {
         try {
