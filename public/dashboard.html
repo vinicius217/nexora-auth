@@ -359,22 +359,22 @@
       </nav>
     </div>
 
-    <div class="modal" id="modal">
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="perfilTitulo">
       <div class="panel modal-card">
         <div class="modal-head">
           <div>
             <span class="panel-kicker">PERFIL</span>
-            <h2>Editar perfil</h2>
+            <h2 id="perfilTitulo">Editar perfil</h2>
             <p class="subtitle">Atualize suas informações públicas.</p>
           </div>
-          <button class="modal-close" data-close="modal">×</button>
+          <button class="modal-close" data-close="modal" aria-label="Fechar edição de perfil">×</button>
         </div>
         <div class="field">
-          <label>Nome</label>
+          <label for="novoNome">Nome</label>
           <input id="novoNome" placeholder="Seu nome" />
         </div>
         <div class="field">
-          <label>URL do avatar</label>
+          <label for="avatarUrl">URL do avatar</label>
           <input id="avatarUrl" placeholder="https://..." />
         </div>
         <div class="modal-actions">
@@ -384,18 +384,18 @@
       </div>
     </div>
 
-    <div class="modal" id="senhaModal">
+    <div class="modal" id="senhaModal" role="dialog" aria-modal="true" aria-labelledby="senhaTitulo">
       <div class="panel modal-card">
         <div class="modal-head">
           <div>
             <span class="panel-kicker">SEGURANÇA</span>
-            <h2>Alterar senha</h2>
+            <h2 id="senhaTitulo">Alterar senha</h2>
             <p class="subtitle">Use uma senha forte e exclusiva.</p>
           </div>
-          <button class="modal-close" data-close="senhaModal">×</button>
+          <button class="modal-close" data-close="senhaModal" aria-label="Fechar alteração de senha">×</button>
         </div>
         <div class="field">
-          <label>Senha atual</label>
+          <label for="senhaAtual">Senha atual</label>
           <div class="input-wrap">
             <input id="senhaAtual" type="password" />
             <button
@@ -408,7 +408,7 @@
           </div>
         </div>
         <div class="field">
-          <label>Nova senha</label>
+          <label for="novaSenha">Nova senha</label>
           <div class="input-wrap">
             <input id="novaSenha" type="password" minlength="8" />
             <button
@@ -485,10 +485,15 @@
         }
       }
       function openModal(id) {
+        $(id).returnFocus = document.activeElement;
         $(id).classList.add("open");
+        document.querySelector(".dashboard-layout")?.setAttribute("inert", "");
+        $(id).querySelector("input, button").focus();
       }
       function closeModal(id) {
         $(id).classList.remove("open");
+        document.querySelector(".dashboard-layout")?.removeAttribute("inert");
+        $(id).returnFocus?.focus();
       }
       function firstName(nome) {
         return (nome || "usuário").trim().split(/\s+/)[0];
@@ -539,7 +544,15 @@
       async function init(showFeedback = false) {
         const btn = $("refreshDashboard");
         if (btn) btn.classList.add("rotating");
-        const u = await getMe();
+        let u;
+        try {
+          u = await getMe();
+        } catch (erro) {
+          mostrarToast(erro.message, "erro");
+          return;
+        } finally {
+          if (btn) btn.classList.remove("rotating");
+        }
         if (btn) setTimeout(() => btn.classList.remove("rotating"), 350);
         if (!u) {
           location.href = "/index.html";
@@ -551,7 +564,13 @@
       }
 
       async function renderSessions() {
-        const sessions = await chamarApi("/auth/sessoes").catch(() => []);
+        let sessions;
+        try {
+          sessions = await chamarApi("/auth/sessoes");
+        } catch (erro) {
+          mostrarToast(erro.message, "erro");
+          return;
+        }
         const current = sessions.find((session) => session.atual);
         if (current) {
           $("sessionTime").textContent = fmtRelative(
@@ -577,11 +596,18 @@
             revoke.className = "secondary-btn";
             revoke.textContent = "Encerrar";
             revoke.addEventListener("click", async () => {
+              setLoading(revoke, true, "Encerrando...");
+              try {
               await chamarApi(`/auth/sessoes/${session.id}`, {
                 method: "DELETE",
               });
               mostrarToast("Sessão encerrada");
               await renderSessions();
+              } catch (erro) {
+                mostrarToast(erro.message, "erro");
+              } finally {
+                setLoading(revoke, false);
+              }
             });
             row.append(copy, revoke);
             container.appendChild(row);
@@ -608,6 +634,20 @@
         }),
       );
       document.addEventListener("keydown", (e) => {
+        const modal = document.querySelector(".modal.open");
+        if (modal && e.key === "Tab") {
+          const controls = [...modal.querySelectorAll("button, input, a[href], [tabindex='0']")]
+            .filter((el) => !el.disabled && el.getClientRects().length);
+          const first = controls[0];
+          const last = controls[controls.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
         if (e.key === "Escape")
           document
             .querySelectorAll(".modal.open")

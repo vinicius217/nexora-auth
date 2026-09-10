@@ -135,7 +135,7 @@
     <script>
       getMe().then((u) => {
         if (u) location.href = "/dashboard.html";
-      });
+      }).catch((erro) => mostrarToast(erro.message, "erro"));
       if (new URLSearchParams(location.search).get("registered") === "1") {
         mostrarToast("Conta criada. Agora você já pode entrar.");
       }
